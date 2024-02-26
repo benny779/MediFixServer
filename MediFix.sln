@@ -1,0 +1,37 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{3BC1AAC1-EF3A-4AF0-96B1-3677311A7D6B}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediFix.Domain", "MediFix.Domain\MediFix.Domain.csproj", "{C8B9A862-AE5C-4424-8395-E25A4E914505}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MediFix.SharedKernel", "MediFix.SharedKernel\MediFix.SharedKernel.csproj", "{1C93D72F-B993-482F-9C98-7D6FC92B3747}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8B9A862-AE5C-4424-8395-E25A4E914505}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C8B9A862-AE5C-4424-8395-E25A4E914505}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C8B9A862-AE5C-4424-8395-E25A4E914505}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C8B9A862-AE5C-4424-8395-E25A4E914505}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1C93D72F-B993-482F-9C98-7D6FC92B3747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1C93D72F-B993-482F-9C98-7D6FC92B3747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1C93D72F-B993-482F-9C98-7D6FC92B3747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1C93D72F-B993-482F-9C98-7D6FC92B3747}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C8B9A862-AE5C-4424-8395-E25A4E914505} = {3BC1AAC1-EF3A-4AF0-96B1-3677311A7D6B}
+		{1C93D72F-B993-482F-9C98-7D6FC92B3747} = {3BC1AAC1-EF3A-4AF0-96B1-3677311A7D6B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {77BB4A2E-892C-43F6-8258-1AB39BFF214D}
+	EndGlobalSection
+EndGlobal
