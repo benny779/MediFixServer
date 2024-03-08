@@ -19,6 +19,8 @@ public class ServiceCall : Entity<ServiceCallId>
 
     public ServiceCallPriority Priority { get; private set; }
 
+    public DateTime DateCreated { get; private set; }
+
     public IReadOnlyCollection<ServiceCallStatusUpdate> Statuses => _statusUpdates;
 
     public TechnicianId? TechnicianId { get; private set; }
@@ -29,19 +31,8 @@ public class ServiceCall : Entity<ServiceCallId>
     public ServiceCallStatus CurrentStatus => Statuses.MaxBy(s => s.DateTime)!.Status;
 
 
-    private ServiceCall(
-        ServiceCallId id,
-        UserId userId,
-        LocationId locationId,
-        SubCategoryId subCategoryId,
-        string details,
-        ServiceCallPriority priority) : base(id)
+    private ServiceCall(ServiceCallId id) : base(id)
     {
-        UserId = userId;
-        LocationId = locationId;
-        SubCategoryId = subCategoryId;
-        Details = details;
-        Priority = priority;
     }
 
     public static Result<ServiceCall> Create(
@@ -54,13 +45,15 @@ public class ServiceCall : Entity<ServiceCallId>
         if (string.IsNullOrEmpty(details))
             return ServiceCallErrors.EmptyDetails;
 
-        var serviceCall = new ServiceCall(
-            new ServiceCallId(Guid.NewGuid()),
-            userId,
-            locationId,
-            subCategoryId,
-            details,
-            priority);
+        var serviceCall = new ServiceCall(new ServiceCallId(Guid.NewGuid()))
+        {
+            UserId = userId,
+            LocationId = locationId,
+            SubCategoryId = subCategoryId,
+            Details = details,
+            Priority = priority,
+            DateCreated = DateTime.Now
+        };
 
         serviceCall.SetStatus(ServiceCallStatus.New);
 
@@ -121,7 +114,7 @@ public class ServiceCall : Entity<ServiceCallId>
         if (IsCancelled)
             return ServiceCallErrors.Cancelled;
 
-        if (CurrentStatus== ServiceCallStatus.Finished)
+        if (CurrentStatus == ServiceCallStatus.Finished)
             return ServiceCallErrors.FinishedCannotBeFinished;
 
         SetStatus(ServiceCallStatus.Finished);
