@@ -1,3 +1,5 @@
-﻿namespace MediFix.Domain.ServiceCalls;
+﻿using MediFix.Domain.Practitioners;
 
-public record ServiceCallStatusUpdate(ServiceCallStatus Status, DateTime DateTime);
+namespace MediFix.Domain.ServiceCalls;
+
+public record ServiceCallStatusUpdate(ServiceCallStatus Status, DateTime DateTime, PractitionerId? PractitionerId = null);

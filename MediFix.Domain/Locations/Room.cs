@@ -1,5 +1,4 @@
 ﻿using MediFix.Domain.Locations.Abstract;
-using MediFix.Domain.ServiceCalls;
 
 namespace MediFix.Domain.Locations;
 

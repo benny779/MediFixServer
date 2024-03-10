@@ -1,5 +1,7 @@
 ﻿using MediFix.Domain.Categories;
 using MediFix.Domain.Core.Primitives;
+using MediFix.Domain.Locations;
+using MediFix.Domain.Practitioners;
 using MediFix.Domain.Users;
 using MediFix.SharedKernel.Results;
 
@@ -9,13 +11,15 @@ public class ServiceCall : Entity<ServiceCallId>
 {
     private readonly List<ServiceCallStatusUpdate> _statusUpdates = [];
 
-    public UserId UserId { get; private set; }
+    public UserId UserId { get; private set; } = null!;
 
-    public LocationId LocationId { get; private set; }
+    public LocationId LocationId { get; private set; } = null!;
 
-    public SubCategoryId SubCategoryId { get; private set; }
+    public ServiceCallType ServiceCallType { get; private set; }
 
-    public string Details { get; private set; }
+    public SubCategoryId SubCategoryId { get; private set; } = null!;
+
+    public string Details { get; private set; } = null!;
 
     public ServiceCallPriority Priority { get; private set; }
 
@@ -23,10 +27,10 @@ public class ServiceCall : Entity<ServiceCallId>
 
     public IReadOnlyCollection<ServiceCallStatusUpdate> Statuses => _statusUpdates;
 
-    public TechnicianId? TechnicianId { get; private set; }
+    public PractitionerId? PractitionerId { get; private set; }
 
 
-    public bool IsAssigned => TechnicianId is not null;
+    public bool IsAssigned => PractitionerId is not null;
     public bool IsCancelled => CurrentStatus == ServiceCallStatus.Cancelled;
     public ServiceCallStatus CurrentStatus => Statuses.MaxBy(s => s.DateTime)!.Status;
 
@@ -38,6 +42,7 @@ public class ServiceCall : Entity<ServiceCallId>
     public static Result<ServiceCall> Create(
         UserId userId,
         LocationId locationId,
+        ServiceCallType serviceCallType,
         SubCategoryId subCategoryId,
         string details,
         ServiceCallPriority priority = ServiceCallPriority.Low)
@@ -49,6 +54,7 @@ public class ServiceCall : Entity<ServiceCallId>
         {
             UserId = userId,
             LocationId = locationId,
+            ServiceCallType = serviceCallType,
             SubCategoryId = subCategoryId,
             Details = details,
             Priority = priority,
@@ -62,22 +68,26 @@ public class ServiceCall : Entity<ServiceCallId>
         return serviceCall;
     }
 
-    private void SetStatus(ServiceCallStatus status) =>
-        _statusUpdates.Add(new ServiceCallStatusUpdate(status, DateTime.Now));
+    private void SetStatus(ServiceCallStatus status, PractitionerId? practitionerId = null) =>
+        _statusUpdates.Add(new ServiceCallStatusUpdate(status, DateTime.Now, practitionerId));
 
-    public Result AssignToTechnician(TechnicianId technicianId)
+    public Result AssignToPractitioner(PractitionerId practitionerId)
     {
         if (IsCancelled)
             return ServiceCallErrors.CancelledAndCannotBeAssigned;
 
-        if (IsAssigned)
+        if (IsAssigned && practitionerId == PractitionerId)
             return ServiceCallErrors.AlreadyAssigned;
 
-        TechnicianId = technicianId;
+        if (CurrentStatus == ServiceCallStatus.Started)
+            return ServiceCallErrors.StartedCannotBeAssigned;
 
-        SetStatus(ServiceCallStatus.AssignedToTechnician);
+        PractitionerId = practitionerId;
+
+        SetStatus(ServiceCallStatus.AssignedToPractitioner, practitionerId);
 
         // TODO: assign to technician event
+        // if a practitioner is changed, we need to notify both practitioners
 
         return Result.Success();
     }
@@ -86,6 +96,9 @@ public class ServiceCall : Entity<ServiceCallId>
     {
         if (IsCancelled)
             return ServiceCallErrors.AlreadyCancelled;
+
+        if (CurrentStatus == ServiceCallStatus.Started)
+            return ServiceCallErrors.StartedCannotBeCancelled;
 
         if (CurrentStatus == ServiceCallStatus.Finished)
             return ServiceCallErrors.FinishedCannotBeCancelled;
@@ -97,25 +110,28 @@ public class ServiceCall : Entity<ServiceCallId>
         return Result.Success();
     }
 
-    public Result TechnicianStarted()
+    public Result Start()
     {
         if (IsCancelled)
             return ServiceCallErrors.Cancelled;
 
-        SetStatus(ServiceCallStatus.TechnicianStarted);
+        if (!IsAssigned)
+            return ServiceCallErrors.NotAssigned;
 
-        // TODO: service call TechnicianStarted event
+        if (CurrentStatus == ServiceCallStatus.Started)
+            return ServiceCallErrors.StartedCannotStart;
+
+        SetStatus(ServiceCallStatus.Started);
+
+        // TODO: service call Started event
 
         return Result.Success();
     }
 
     public Result Finish()
     {
-        if (IsCancelled)
-            return ServiceCallErrors.Cancelled;
-
-        if (CurrentStatus == ServiceCallStatus.Finished)
-            return ServiceCallErrors.FinishedCannotBeFinished;
+        if (CurrentStatus != ServiceCallStatus.Started)
+            return ServiceCallErrors.NotStarted;
 
         SetStatus(ServiceCallStatus.Finished);
 

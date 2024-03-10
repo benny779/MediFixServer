@@ -11,18 +11,8 @@ public class User : Entity<UserId>
     public string Phone { get; private set; }
     public string HashedPassword { get; private set; }
 
-    private User(UserId id,
-        string firstName,
-        string lastName,
-        string email,
-        string phone,
-        string hashedPassword) : base(id)
+    private User(UserId id) : base(id)
     {
-        FirstName = firstName;
-        LastName = lastName;
-        Email = email;
-        Phone = phone;
-        HashedPassword = hashedPassword;
     }
 
     public static Result<User> Create(
@@ -33,12 +23,13 @@ public class User : Entity<UserId>
         string phone,
         string hashedPassword)
     {
-        return new User(
-            id,
-            firstName,
-            lastName,
-            email,
-            phone,
-            hashedPassword);
+        return new User(id)
+        {
+            FirstName = firstName,
+            LastName = lastName,
+            Email = email,
+            Phone = phone,
+            HashedPassword = hashedPassword
+        };
     }
 }

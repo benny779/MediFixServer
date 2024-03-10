@@ -3,8 +3,8 @@
 public enum ServiceCallStatus : byte
 {
     New = 1,
-    AssignedToTechnician,
-    TechnicianStarted,
+    AssignedToPractitioner,
+    Started,
     Finished,
     Cancelled
 }
