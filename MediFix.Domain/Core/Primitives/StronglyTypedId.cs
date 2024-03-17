@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using MediFix.SharedKernel.Results;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;

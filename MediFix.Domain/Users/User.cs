@@ -5,11 +5,11 @@ namespace MediFix.Domain.Users;
 
 public class User : Entity<UserId>
 {
-    public string FirstName { get; private set; }
-    public string LastName { get; private set; }
-    public string Email { get; private set; }
-    public string Phone { get; private set; }
-    public string HashedPassword { get; private set; }
+    public string FirstName { get; private set; } = null!;
+    public string LastName { get; private set; } = null!;
+    public string Email { get; private set; } = null!;
+    public string Phone { get; private set; } = null!;
+    public string HashedPassword { get; private set; } = null!;
 
     private User(UserId id) : base(id)
     {

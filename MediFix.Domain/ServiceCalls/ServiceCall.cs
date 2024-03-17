@@ -9,7 +9,7 @@ namespace MediFix.Domain.ServiceCalls;
 
 public class ServiceCall : Entity<ServiceCallId>
 {
-    private readonly List<ServiceCallStatusUpdate> _statusUpdates = [];
+    private readonly List<ServiceCallStatusUpdate> _statusHistory = [];
 
     public UserId UserId { get; private set; } = null!;
 
@@ -25,14 +25,18 @@ public class ServiceCall : Entity<ServiceCallId>
 
     public DateTime DateCreated { get; private set; }
 
-    public IReadOnlyCollection<ServiceCallStatusUpdate> Statuses => _statusUpdates;
+    public ServiceCallStatus Status { get; private set; }
+
+    public DateTime StatusDateTime { get; private set; }
 
     public PractitionerId? PractitionerId { get; private set; }
 
+    public IReadOnlyCollection<ServiceCallStatusUpdate> StatusHistory => _statusHistory;
+
+
 
     public bool IsAssigned => PractitionerId is not null;
-    public bool IsCancelled => CurrentStatus == ServiceCallStatus.Cancelled;
-    public ServiceCallStatus CurrentStatus => Statuses.MaxBy(s => s.DateTime)!.Status;
+    public bool IsCancelled => Status == ServiceCallStatus.Cancelled;
 
 
     private ServiceCall(ServiceCallId id) : base(id)
@@ -68,8 +72,18 @@ public class ServiceCall : Entity<ServiceCallId>
         return serviceCall;
     }
 
-    private void SetStatus(ServiceCallStatus status, PractitionerId? practitionerId = null) =>
-        _statusUpdates.Add(new ServiceCallStatusUpdate(status, DateTime.Now, practitionerId));
+    private void SetStatus(ServiceCallStatus status, PractitionerId? practitionerId = null)
+    {
+        Status = status;
+        StatusDateTime = DateTime.Now;
+
+        if (practitionerId is not null)
+        {
+            PractitionerId = practitionerId;
+        }
+
+        _statusHistory.Add(new ServiceCallStatusUpdate(status, StatusDateTime, practitionerId));
+    }
 
     public Result AssignToPractitioner(PractitionerId practitionerId)
     {
@@ -79,7 +93,7 @@ public class ServiceCall : Entity<ServiceCallId>
         if (IsAssigned && practitionerId == PractitionerId)
             return ServiceCallErrors.AlreadyAssigned;
 
-        if (CurrentStatus == ServiceCallStatus.Started)
+        if (Status == ServiceCallStatus.Started)
             return ServiceCallErrors.StartedCannotBeAssigned;
 
         PractitionerId = practitionerId;
@@ -97,10 +111,10 @@ public class ServiceCall : Entity<ServiceCallId>
         if (IsCancelled)
             return ServiceCallErrors.AlreadyCancelled;
 
-        if (CurrentStatus == ServiceCallStatus.Started)
+        if (Status == ServiceCallStatus.Started)
             return ServiceCallErrors.StartedCannotBeCancelled;
 
-        if (CurrentStatus == ServiceCallStatus.Finished)
+        if (Status == ServiceCallStatus.Finished)
             return ServiceCallErrors.FinishedCannotBeCancelled;
 
         SetStatus(ServiceCallStatus.Cancelled);
@@ -118,7 +132,7 @@ public class ServiceCall : Entity<ServiceCallId>
         if (!IsAssigned)
             return ServiceCallErrors.NotAssigned;
 
-        if (CurrentStatus == ServiceCallStatus.Started)
+        if (Status == ServiceCallStatus.Started)
             return ServiceCallErrors.StartedCannotStart;
 
         SetStatus(ServiceCallStatus.Started);
@@ -130,7 +144,7 @@ public class ServiceCall : Entity<ServiceCallId>
 
     public Result Finish()
     {
-        if (CurrentStatus != ServiceCallStatus.Started)
+        if (Status != ServiceCallStatus.Started)
             return ServiceCallErrors.NotStarted;
 
         SetStatus(ServiceCallStatus.Finished);
