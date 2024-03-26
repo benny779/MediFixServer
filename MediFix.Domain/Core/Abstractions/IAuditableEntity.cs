@@ -7,10 +7,3 @@ public interface IAuditableEntity
     public Guid? LastModifiedBy { get; set; }
     public DateTime? LastModifiedAt { get; set; }
 }
-
-public interface IDeletableEntity
-{
-    Guid? DeletedBy { get; set; }
-    DateTime? DeletedOn { get; set; }
-    bool IsDeleted => DeletedBy is not null;
-}
