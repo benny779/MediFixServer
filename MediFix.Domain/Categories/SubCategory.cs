@@ -1,10 +1,10 @@
-﻿using MediFix.Domain.Core.Primitives;
+﻿namespace MediFix.Domain.Categories;
 
-namespace MediFix.Domain.Categories;
-
-public class SubCategory(SubCategoryId id, string name, CategoryId parentId) : Entity<SubCategoryId>(id)
+public class SubCategory(SubCategoryId id, string name, CategoryId categoryId) : Entity<SubCategoryId>(id)
 {
+    public const int NameMaxLength = 50;
+
     public string Name { get; set; } = name;
 
-    public CategoryId ParentId { get; set; } = parentId;
+    public CategoryId CategoryId { get; set; } = categoryId;
 }

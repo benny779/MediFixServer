@@ -1,10 +1,12 @@
-﻿using MediFix.Domain.Core.Primitives;
-using MediFix.SharedKernel.Results;
+﻿using MediFix.Domain.ServiceCalls;
 
 namespace MediFix.Domain.Users;
 
 public class User : Entity<UserId>
 {
+    public const int FirstNameMaxLength = 30;
+    public const int LastNameMaxLength = 30;
+
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
     public string Email { get; private set; } = null!;

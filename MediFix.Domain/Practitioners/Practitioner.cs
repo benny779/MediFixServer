@@ -1,10 +1,10 @@
-﻿using MediFix.Domain.Core.Primitives;
-using MediFix.SharedKernel.Results;
+﻿namespace MediFix.Domain.Practitioners;
 
-namespace MediFix.Domain.Practitioners;
-
-public class Practitioner : Entity<PractitionerId>
+public class Practitioner : AggregateRoot<PractitionerId>
 {
+    public const int FirstNameMaxLength = 30;
+    public const int LastNameMaxLength = 30;
+
     public string FirstName { get; private set; } = null!;
     public string LastName { get; private set; } = null!;
     public string Email { get; private set; } = null!;
@@ -22,7 +22,7 @@ public class Practitioner : Entity<PractitionerId>
         string lastName,
         string email,
         string phone,
-        ExpertiseId expertiseId
+        ExpertiseId? expertiseId = null
     )
     {
         return new Practitioner(practitionerId)
@@ -34,4 +34,7 @@ public class Practitioner : Entity<PractitionerId>
             ExpertiseId = expertiseId
         };
     }
+
+    public void SetExpertise(ExpertiseId expertiseId) =>
+        ExpertiseId = expertiseId;
 }

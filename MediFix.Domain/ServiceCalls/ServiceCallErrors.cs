@@ -1,6 +1,4 @@
-﻿using MediFix.SharedKernel.Results;
-
-namespace MediFix.Domain.ServiceCalls;
+﻿namespace MediFix.Domain.ServiceCalls;
 
 public static class ServiceCallErrors
 {

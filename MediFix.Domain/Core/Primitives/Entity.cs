@@ -6,7 +6,16 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
 
     public TId Id { get; set; }
 
-    protected Entity(TId id) => Id = id;
+    protected Entity(TId id)
+    {
+        Id = id;
+    }
+
+#pragma warning disable CS8618
+    protected Entity()
+    {
+    }
+#pragma warning restore CS8618
 
     public bool Equals(Entity<TId>? other)
     {

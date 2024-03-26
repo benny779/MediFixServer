@@ -1,13 +1,11 @@
 ﻿using MediFix.Domain.Categories;
-using MediFix.Domain.Core.Primitives;
 using MediFix.Domain.Locations;
 using MediFix.Domain.Practitioners;
 using MediFix.Domain.Users;
-using MediFix.SharedKernel.Results;
 
 namespace MediFix.Domain.ServiceCalls;
 
-public class ServiceCall : Entity<ServiceCallId>
+public class ServiceCall : AggregateRoot<ServiceCallId>
 {
     private readonly List<ServiceCallStatusUpdate> _statusHistory = [];
 
@@ -38,6 +36,10 @@ public class ServiceCall : Entity<ServiceCallId>
     public bool IsAssigned => PractitionerId is not null;
     public bool IsCancelled => Status == ServiceCallStatus.Cancelled;
 
+
+    private ServiceCall()
+    {
+    }
 
     private ServiceCall(ServiceCallId id) : base(id)
     {
@@ -82,7 +84,7 @@ public class ServiceCall : Entity<ServiceCallId>
             PractitionerId = practitionerId;
         }
 
-        _statusHistory.Add(new ServiceCallStatusUpdate(status, StatusDateTime, practitionerId));
+        _statusHistory.Add(new ServiceCallStatusUpdate(Id, status, StatusDateTime, practitionerId));
     }
 
     public Result AssignToPractitioner(PractitionerId practitionerId)
