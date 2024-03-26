@@ -1,0 +1,11 @@
+Create Migration
+dotnet ef migrations add InitialCreate -p .\MediFix.Infrastructure\ -s .\MediFix.Api\
+
+Remove Migration
+dotnet ef migrations remove -p .\MediFix.Infrastructure\ -s .\MediFix.Api\
+
+Update Database
+dotnet ef database update -p .\MediFix.Infrastructure\ -s .\MediFix.Api\
+
+Revert to first migration
+dotnet ef database update 0 -p .\MediFix.Infrastructure\ -s .\MediFix.Api\
