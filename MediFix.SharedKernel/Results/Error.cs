@@ -30,6 +30,18 @@ public record Error
         string code = "General.NotFound",
         string description = "A 'Not Found' error has occurred.")
             => new(code, description, ErrorType.NotFound);
+
+    public static Error EntityNotFound<TEntity>()
+        => new(
+            $"{typeof(TEntity).Name}.NotFound",
+            $"{typeof(TEntity).Name} entity not found.",
+            ErrorType.NotFound);
+
+    public static Error EntityNotFound<TEntity>(object id)
+        => new(
+            $"{typeof(TEntity).Name}.WithId.NotFound",
+            $"The entity {typeof(TEntity).Name} with id '{id}' was not found.",
+            ErrorType.NotFound);
     public static Error Unauthorized(
         string code = "General.Unauthorized",
         string description = "An 'Unauthorized' error has occurred.")

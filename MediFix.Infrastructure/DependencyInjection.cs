@@ -1,5 +1,5 @@
-﻿using MediFix.Application.Users;
-using MediFix.Application.Users.CreateUser;
+﻿using MediFix.Application.Locations;
+using MediFix.Application.Users;
 using MediFix.Infrastructure.Persistence;
 using MediFix.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -23,13 +23,17 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<ApplicationDbContext>(options =>
+        services.AddDbContext<DbContext, ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("MediFix")));
-            //options.UseSqlServer());
 
-        services.AddScoped<IUsersRepository, UserRepository>();
-        //services.AddScoped<IServiceCallRepository, ServiceCallRepository>();
+        AddRepositories(services);
 
         return services;
+    }
+
+    private static void AddRepositories(IServiceCollection services)
+    {
+        services.AddScoped<IUsersRepository, UsersRepository>();
+        services.AddScoped<ILocationsRepository, LocationsRepository>();
     }
 }
