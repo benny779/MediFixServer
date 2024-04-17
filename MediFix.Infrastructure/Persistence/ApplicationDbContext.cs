@@ -1,4 +1,5 @@
 ﻿using MediFix.Domain.Categories;
+using MediFix.Domain.Locations;
 using MediFix.Domain.Practitioners;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
@@ -21,10 +22,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<ServiceCall> ServiceCalls { get; set; } = null!;
     public DbSet<Practitioner> Practitioners { get; set; } = null!;
     public DbSet<User> Users { get; set; } = null!;
-    //public DbSet<Building> Buildings { get; set; }= null!;
-    //public DbSet<Department> Departments { get; set; }= null!;
-    //public DbSet<Floor> Floors { get; set; }= null!;
-    //public DbSet<Room> Rooms { get; set; }= null!;
+    public DbSet<Location> Locations { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
