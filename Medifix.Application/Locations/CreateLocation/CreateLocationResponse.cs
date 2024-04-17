@@ -6,4 +6,5 @@ public record CreateLocationResponse(
     Guid Id,
     LocationType LocationType,
     string Name,
+    bool IsActive,
     Guid? ParentLocationId);

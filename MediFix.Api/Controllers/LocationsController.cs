@@ -1,8 +1,10 @@
 ﻿using MediatR;
-using MediFix.Application.Locations;
 using MediFix.Application.Locations.CreateLocation;
+using MediFix.Application.Locations.DeleteLocation;
+using MediFix.Application.Locations.GetLocation;
+using MediFix.Application.Locations.GetLocationChildren;
+using MediFix.Application.Locations.SetActiveStatus;
 using MediFix.Domain.Locations;
-using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;
@@ -12,22 +14,33 @@ namespace MediFix.Api.Controllers;
 public class LocationsController(ISender sender) : ControllerBase
 {
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(
-        Guid id,
-        ILocationsRepository locationsRepository,
-        CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(Guid id, [FromQuery] bool includeParents, CancellationToken cancellationToken)
     {
         var locationId = new LocationId(id);
-        var locationResult = await locationsRepository.GetByIdAsync(locationId, cancellationToken);
+        var query = new GetLocationRequest(locationId, includeParents);
+
+        var locationResult = await sender.Send(query, cancellationToken);
 
         return locationResult.IsFailure
-            ? NotFound(Error.EntityNotFound<Location>(id))
+            ? NotFound(locationResult.Error)
             : Ok(locationResult.Value);
     }
 
+    [HttpGet("{id:guid}/children")]
+    public async Task<IActionResult> GetChildren(Guid id, CancellationToken cancellationToken)
+    {
+        var locationId = new LocationId(id);
+        var query = new GetLocationChildrenRequest(locationId);
+
+        var locationsResult = await sender.Send(query, cancellationToken);
+
+        return locationsResult.IsFailure
+            ? NotFound(locationsResult.Error)
+            : Ok(locationsResult.Value);
+    }
+
+
     [HttpPost]
-    [ProducesResponseType(StatusCodes.Status201Created)]
-    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Create(CreateLocationCommand request, CancellationToken cancellationToken)
     {
         var createResult = await sender.Send(request, cancellationToken);
@@ -37,6 +50,30 @@ public class LocationsController(ISender sender) : ControllerBase
             : CreatedAtAction(
                 nameof(GetById),
                 createResult.Value!);
+    }
+
+    [HttpPost("{id:guid}/activate")]
+    public async Task<IActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    {
+        return await SetActiveMode(id, true, cancellationToken);
+    }
+
+    [HttpPost("{id:guid}/deactivate")]
+    public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    {
+        return await SetActiveMode(id, false, cancellationToken);
+    }
+
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    {
+        var locationId = new LocationId(id);
+        var request = new DeleteLocationCommand(locationId);
+
+        var deleteResult = await sender.Send(request, cancellationToken);
+
+        return deleteResult.IsSuccess ? NoContent() : Problem(deleteResult.Error.Description);
     }
 
 
@@ -60,5 +97,16 @@ public class LocationsController(ISender sender) : ControllerBase
         id = property?.GetValue(value);
 
         return id is not null;
+    }
+
+
+    private async Task<IActionResult> SetActiveMode(Guid id, bool isActive, CancellationToken cancellationToken)
+    {
+        var locationId = new LocationId(id);
+        var command = new SetLocationActiveStatusCommand(locationId, isActive);
+
+        var updateResult = await sender.Send(command, cancellationToken);
+
+        return updateResult.IsSuccess ? NoContent() : Problem(updateResult.Error.Description);
     }
 }

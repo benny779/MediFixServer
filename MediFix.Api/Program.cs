@@ -3,7 +3,6 @@ using MediFix.Application;
 using MediFix.Domain.Core.Primitives;
 using MediFix.Infrastructure;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
