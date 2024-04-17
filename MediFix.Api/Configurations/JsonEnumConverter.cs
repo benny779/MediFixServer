@@ -10,22 +10,45 @@ public class JsonEnumConverter<TEnum> : JsonConverter<TEnum>
 {
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        if (reader.TryGetInt32(out int value))
-        {
-            return (TEnum)Enum.ToObject(typeof(TEnum), value);
-        }
+        JsonTokenType token = reader.TokenType;
 
-        return (TEnum)Enum.Parse(typeToConvert, reader.GetString()!);
+        switch (token)
+        {
+            case JsonTokenType.Number when reader.TryGetInt32(out int value):
+                {
+                    var enumValue = (TEnum)Enum.ToObject(typeof(TEnum), value);
+
+                    if (!Enum.IsDefined(typeToConvert, enumValue))
+                    {
+                        throw new JsonException($"'{enumValue}' is not defined in '{typeToConvert.Name}'.");
+                    }
+
+                    return enumValue;
+                }
+            case JsonTokenType.String:
+                {
+                    var stringToConvert = reader.GetString();
+
+                    if (Enum.TryParse(typeToConvert, stringToConvert, ignoreCase: false, out object? resultA))
+                    {
+                        return (TEnum)resultA;
+                    }
+
+                    if (Enum.TryParse(typeToConvert, stringToConvert, ignoreCase: true, out object? resultB))
+                    {
+                        return (TEnum)resultB;
+                    }
+
+                    throw new JsonException($"'{stringToConvert}' is not defined in '{typeToConvert.Name}'.");
+                }
+            default:
+                throw new JsonException($"Cannot convert to '{typeToConvert.Name}'.");
+        }
     }
+
 
     public override void Write(Utf8JsonWriter writer, TEnum value, JsonSerializerOptions options)
     {
-        if (value is null)
-        {
-            writer.WriteNullValue();
-            return;
-        }
-
         var enumType = value.GetType();
 
         if (Attribute.IsDefined(enumType, typeof(FlagsAttribute)))
