@@ -16,14 +16,46 @@ public class JsonEnumConverter<TEnum> : JsonConverter<TEnum>
         {
             case JsonTokenType.Number when reader.TryGetInt32(out int value):
                 {
-                    var enumValue = (TEnum)Enum.ToObject(typeof(TEnum), value);
+                    return GetEnumValue(typeToConvert, value);
+                }
+            case JsonTokenType.StartObject:
+                {
+                    // TODO: Extract a method
+                    int? value = null;
+                    string? name = null;
 
-                    if (!Enum.IsDefined(typeToConvert, enumValue))
+                    while (reader.Read())
                     {
-                        throw new JsonException($"'{enumValue}' is not defined in '{typeToConvert.Name}'.");
+                        if (reader.TokenType == JsonTokenType.EndObject)
+                        {
+                            break;
+                        }
+
+                        if (reader.TokenType is not JsonTokenType.PropertyName)
+                        {
+                            continue;
+                        }
+
+                        var propertyName = reader.GetString();
+                        reader.Read();
+
+                        switch (propertyName?.ToLower())
+                        {
+                            case "value" when reader.TokenType is JsonTokenType.Number:
+                                value = reader.GetInt32();
+                                break;
+                            case "name" when reader.TokenType is JsonTokenType.String:
+                                name = reader.GetString();
+                                break;
+                        }
                     }
 
-                    return enumValue;
+                    if (value.HasValue && name is not null)
+                    {
+                        return GetEnumValue(typeToConvert, value.Value);
+                    }
+
+                    throw CreateException(typeToConvert.Name);
                 }
             case JsonTokenType.String:
                 {
@@ -42,8 +74,23 @@ public class JsonEnumConverter<TEnum> : JsonConverter<TEnum>
                     throw new JsonException($"'{stringToConvert}' is not defined in '{typeToConvert.Name}'.");
                 }
             default:
-                throw new JsonException($"Cannot convert to '{typeToConvert.Name}'.");
+                throw CreateException(typeToConvert.Name);
         }
+    }
+
+    private static JsonException CreateException(string typeToConvert)
+        => new($"Cannot convert an enum to '{typeToConvert}'.");
+
+    private static TEnum GetEnumValue(Type typeToConvert, int value)
+    {
+        var enumValue = (TEnum)Enum.ToObject(typeof(TEnum), value);
+
+        if (!Enum.IsDefined(typeToConvert, enumValue))
+        {
+            throw new JsonException($"'{enumValue}' is not defined in '{typeToConvert.Name}'.");
+        }
+
+        return enumValue;
     }
 
 

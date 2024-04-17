@@ -30,6 +30,7 @@ internal class LocationConfiguration : IEntityTypeConfiguration<Location>
             .HasForeignKey(l => l.ParentId);
 
         builder.HasIndex(b => new { b.Name, b.LocationType, b.ParentId })
-            .IsUnique();
+            .IsUnique()
+            .HasFilter(null);
     }
 }
