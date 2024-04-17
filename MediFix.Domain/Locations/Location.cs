@@ -5,12 +5,14 @@ public class Location : Entity<LocationId>
     public const int NameMaxLength = 30;
 
 
-    public LocationType LocationType { get; private set; }
+    public LocationType LocationType { get; init; }
 
     public string Name { get; private set; } = null!;
 
+    public bool IsActive { get; private set; }
+
     public LocationId? ParentId { get; set; }
-    
+
     public Location? Parent { get; private set; }
 
 
@@ -38,6 +40,7 @@ public class Location : Entity<LocationId>
             return new Location(locationId)
             {
                 LocationType = locationType,
+                IsActive = true,
                 Name = name,
             };
         }
@@ -59,9 +62,13 @@ public class Location : Entity<LocationId>
         {
             LocationType = locationType,
             Name = name,
-            Parent = parent
+            IsActive = true,
+            Parent = parent,
+            ParentId = parent.Id
         };
     }
+
+    public virtual void SetActiveStatus(bool isActive) => IsActive = isActive;
 }
 
 public enum LocationType : byte
