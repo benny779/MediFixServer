@@ -9,6 +9,7 @@ public record Error
 
     public static readonly Error None = new(string.Empty, default, ErrorType.Failure);
     public static readonly Error NullValue = Validation("Error.NullValue", "The specified result value is null.");
+    public static readonly Error EmptyList = Validation("Error.EmptyList", "The specified list is empty.");
 
     public static Error Failure(
         string code = "General.Failure",
