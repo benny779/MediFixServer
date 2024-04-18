@@ -7,13 +7,14 @@ namespace MediFix.Infrastructure.Persistence.Repositories.Abstractions;
 public abstract class Repository<TEntity, TId>(DbContext dbContext)
     : IRepository<TEntity, TId>
     where TEntity : Entity<TId>
+    where TId : class
 {
     public async Task<Result<TEntity>> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
         var entity = await dbContext
             .Set<TEntity>()
             .AsNoTracking()
-            .SingleOrDefaultAsync(e => e.Id!.Equals(id), cancellationToken);
+            .SingleOrDefaultAsync(e => e.Id.Equals(id), cancellationToken);
 
         if (entity is null)
         {
@@ -49,7 +50,7 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     public async Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
         var rowsDeleted = await dbContext.Set<TEntity>()
-            .Where(l => l.Id!.Equals(id))
+            .Where(l => l.Id.Equals(id))
             .ExecuteDeleteAsync(cancellationToken);
 
         return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<TEntity>(id);
