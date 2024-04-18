@@ -10,7 +10,10 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
 {
     public async Task<Result<TEntity>> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
-        var entity = await dbContext.Set<TEntity>().FindAsync([id], cancellationToken);
+        var entity = await dbContext
+            .Set<TEntity>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(e => e.Id!.Equals(id), cancellationToken);
 
         if (entity is null)
         {
