@@ -1,6 +1,8 @@
-﻿using MediFix.Application.Locations;
+﻿using MediFix.Application.Abstractions.Data;
+using MediFix.Application.Locations;
 using MediFix.Application.Users;
 using MediFix.Infrastructure.Persistence;
+using MediFix.Infrastructure.Persistence.Abstractions;
 using MediFix.Infrastructure.Persistence.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -25,6 +27,8 @@ public static class DependencyInjection
     {
         services.AddDbContext<DbContext, ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("MediFix")));
+
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         AddRepositories(services);
 

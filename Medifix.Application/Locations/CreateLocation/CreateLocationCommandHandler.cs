@@ -1,11 +1,13 @@
-﻿using MediFix.Application.Abstractions.Messaging;
+﻿using MediFix.Application.Abstractions.Data;
+using MediFix.Application.Abstractions.Messaging;
 using MediFix.Domain.Locations;
 using MediFix.SharedKernel.Results;
 
 namespace MediFix.Application.Locations.CreateLocation;
 
 internal sealed class CreateLocationCommandHandler(
-    ILocationsRepository locationsRepository)
+    ILocationsRepository locationsRepository,
+    IUnitOfWork unitOfWork)
     : ICommandHandler<CreateLocationCommand, CreateLocationResponse>
 {
     public async Task<Result<CreateLocationResponse>> Handle(CreateLocationCommand request, CancellationToken cancellationToken)
@@ -27,12 +29,9 @@ internal sealed class CreateLocationCommandHandler(
 
         var location = createLocationResult.Value!;
 
-        var result = await locationsRepository.InsertAsync(location, cancellationToken);
-
-        if (result.IsFailure)
-        {
-            return result.Error;
-        }
+        locationsRepository.Insert(location);
+        
+        await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new CreateLocationResponse(
             location.Id.Value,

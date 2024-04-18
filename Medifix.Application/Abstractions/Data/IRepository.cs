@@ -7,8 +7,8 @@ public interface IRepository<TEntity, in TId>
     where TEntity : Entity<TId>
 {
     Task<Result<TEntity>> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
-    Task<Result> InsertAsync(TEntity entity, CancellationToken cancellationToken = default);
-    Task<Result> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default);
-    Task<Result> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default);
+    void Insert(TEntity entity);
+    void Update(TEntity entity);
+    void Delete(TEntity entity);
     Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default);
 }

@@ -2,7 +2,7 @@
 using MediFix.Domain.Core.Primitives;
 using Microsoft.EntityFrameworkCore;
 
-namespace MediFix.Infrastructure.Persistence.Repositories.Abstractions;
+namespace MediFix.Infrastructure.Persistence.Abstractions;
 
 public abstract class Repository<TEntity, TId>(DbContext dbContext)
     : IRepository<TEntity, TId>
@@ -23,29 +23,17 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
 
         return entity;
     }
-    public async Task<Result> InsertAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public void Insert(TEntity entity)
     {
         dbContext.Set<TEntity>().Add(entity);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
     }
-    public async Task<Result> UpdateAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public void Update(TEntity entity)
     {
         dbContext.Set<TEntity>().Update(entity);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
     }
-    public async Task<Result> DeleteAsync(TEntity entity, CancellationToken cancellationToken = default)
+    public void Delete(TEntity entity)
     {
         dbContext.Set<TEntity>().Remove(entity);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
     }
     public async Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default)
     {

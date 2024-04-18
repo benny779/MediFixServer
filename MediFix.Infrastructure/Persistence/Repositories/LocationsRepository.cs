@@ -1,6 +1,6 @@
 ﻿using MediFix.Application.Locations;
 using MediFix.Domain.Locations;
-using MediFix.Infrastructure.Persistence.Repositories.Abstractions;
+using MediFix.Infrastructure.Persistence.Abstractions;
 using MediFix.SharedKernel.Extensions;
 using Microsoft.EntityFrameworkCore;
 
