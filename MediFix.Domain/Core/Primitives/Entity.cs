@@ -4,7 +4,7 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>
 {
     const int HashMultiplier = 37;
 
-    public TId Id { get; set; }
+    public TId Id { get; init; }
 
     protected Entity(TId id)
     {
