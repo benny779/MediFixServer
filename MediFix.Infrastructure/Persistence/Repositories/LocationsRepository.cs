@@ -89,17 +89,17 @@ public class LocationsRepository(ApplicationDbContext dbContext) : ILocationsRep
     {
         dbContext.Locations.Remove(location);
 
-        await dbContext.SaveChangesAsync(cancellationToken);
+        var rowsDeleted = await dbContext.SaveChangesAsync(cancellationToken);
 
-        return Result.Success();
+        return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<Location>(location.Id);
     }
 
     public async Task<Result> DeleteAsync(LocationId locationId, CancellationToken cancellationToken = default)
     {
-        await dbContext.Locations
-            .Where(l => l.Id == locationId)
-            .ExecuteDeleteAsync(cancellationToken);
+        var rowsDeleted = await dbContext.Locations
+              .Where(l => l.Id == locationId)
+              .ExecuteDeleteAsync(cancellationToken);
 
-        return Result.Success();
+        return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<Location>(locationId);
     }
 }
