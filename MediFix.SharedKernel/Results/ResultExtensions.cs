@@ -3,9 +3,9 @@
 public static class ResultExtensions
 {
     public static TResponse Match<TResponse>(
-        this Result<TResponse> result,
-    Func<TResponse> onSuccess,
-    Func<Error, TResponse> onFailure)
+        this Result result,
+        Func<TResponse> onSuccess,
+        Func<Error, TResponse> onFailure)
     {
         return result.IsSuccess ? onSuccess() : onFailure(result.Error);
     }
