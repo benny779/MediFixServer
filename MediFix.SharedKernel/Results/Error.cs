@@ -38,7 +38,7 @@ public record Error
             $"{typeof(TEntity).Name} entity not found.",
             ErrorType.NotFound);
 
-    public static Error EntityNotFound<TEntity>(object id)
+    public static Error EntityNotFound<TEntity>(object? id)
         => new(
             $"{typeof(TEntity).Name}.WithId.NotFound",
             $"The entity {typeof(TEntity).Name} with id '{id}' was not found.",

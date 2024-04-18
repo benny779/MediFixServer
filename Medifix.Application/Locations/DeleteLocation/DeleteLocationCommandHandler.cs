@@ -9,6 +9,6 @@ internal sealed class DeleteLocationCommandHandler(
 {
     public async Task<Result> Handle(DeleteLocationCommand request, CancellationToken cancellationToken)
     {
-        return await locationsRepository.DeleteAsync(request.LocationId, cancellationToken);
+        return await locationsRepository.DeleteByIdAsync(request.LocationId, cancellationToken);
     }
 }

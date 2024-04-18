@@ -1,24 +1,14 @@
 ﻿using MediFix.Application.Locations;
 using MediFix.Domain.Locations;
+using MediFix.Infrastructure.Persistence.Repositories.Abstractions;
 using MediFix.SharedKernel.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace MediFix.Infrastructure.Persistence.Repositories;
 
-public class LocationsRepository(ApplicationDbContext dbContext) : ILocationsRepository
+public class LocationsRepository(ApplicationDbContext dbContext) 
+    : Repository<Location, LocationId>(dbContext), ILocationsRepository
 {
-    public async Task<Result<Location>> GetByIdAsync(LocationId locationId, CancellationToken cancellationToken = default)
-    {
-        var location = await dbContext.Locations.FindAsync([locationId], cancellationToken);
-
-        if (location is null)
-        {
-            return Error.EntityNotFound<Location>(locationId.Value);
-        }
-
-        return location;
-    }
-
     public async Task<Result<List<Location>>> GetByIdWithParentsAsync(LocationId locationId, CancellationToken cancellationToken = default)
     {
         string query = $"""
@@ -65,41 +55,5 @@ public class LocationsRepository(ApplicationDbContext dbContext) : ILocationsRep
         }
 
         return locations;
-    }
-
-    public async Task<Result> InsertAsync(Location location, CancellationToken cancellationToken = default)
-    {
-        dbContext.Locations.Add(location);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
-    }
-
-    public async Task<Result> UpdateAsync(Location location, CancellationToken cancellationToken = default)
-    {
-        dbContext.Locations.Update(location);
-
-        await dbContext.SaveChangesAsync(cancellationToken);
-
-        return Result.Success();
-    }
-
-    public async Task<Result> DeleteAsync(Location location, CancellationToken cancellationToken = default)
-    {
-        dbContext.Locations.Remove(location);
-
-        var rowsDeleted = await dbContext.SaveChangesAsync(cancellationToken);
-
-        return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<Location>(location.Id);
-    }
-
-    public async Task<Result> DeleteAsync(LocationId locationId, CancellationToken cancellationToken = default)
-    {
-        var rowsDeleted = await dbContext.Locations
-              .Where(l => l.Id == locationId)
-              .ExecuteDeleteAsync(cancellationToken);
-
-        return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<Location>(locationId);
     }
 }

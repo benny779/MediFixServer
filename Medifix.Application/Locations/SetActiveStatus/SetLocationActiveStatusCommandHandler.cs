@@ -9,22 +9,17 @@ internal sealed class SetLocationActiveStatusCommandHandler(
 {
     public async Task<Result> Handle(SetLocationActiveStatusCommand request, CancellationToken cancellationToken)
     {
-        var locationResult = await locationsRepository
-            .GetByIdAsync(
-                request.LocationId,
-                cancellationToken);
+        var locationResult = await locationsRepository.GetByIdAsync(request.LocationId, cancellationToken);
 
         if (locationResult.IsFailure)
         {
-            return Result.Success();
+            return locationResult.Error;
         }
 
         var location = locationResult.Value!;
 
         location.SetActiveStatus(request.IsActive);
 
-        var updateResult = await locationsRepository.UpdateAsync(location, cancellationToken);
-
-        return updateResult.IsSuccess ? Result.Success() : locationResult.Error;
+        return await locationsRepository.UpdateAsync(location, cancellationToken);
     }
 }
