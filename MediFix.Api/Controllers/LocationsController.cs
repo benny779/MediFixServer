@@ -5,13 +5,12 @@ using MediFix.Application.Locations.GetLocation;
 using MediFix.Application.Locations.GetLocationChildren;
 using MediFix.Application.Locations.SetActiveStatus;
 using MediFix.Domain.Locations;
+using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;
 
-[ApiController]
-[Route("[controller]")]
-public class LocationsController(ISender sender) : ControllerBase
+public class LocationsController(ISender sender) : ApiController
 {
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(Guid id, [FromQuery] bool includeParents, CancellationToken cancellationToken)
@@ -21,9 +20,7 @@ public class LocationsController(ISender sender) : ControllerBase
 
         var locationResult = await sender.Send(query, cancellationToken);
 
-        return locationResult.IsFailure
-            ? NotFound(locationResult.Error)
-            : Ok(locationResult.Value);
+        return locationResult.Match(Ok, Problem);
     }
 
     [HttpGet("{id:guid}/children")]
@@ -34,9 +31,7 @@ public class LocationsController(ISender sender) : ControllerBase
 
         var locationsResult = await sender.Send(query, cancellationToken);
 
-        return locationsResult.IsFailure
-            ? NotFound(locationsResult.Error)
-            : Ok(locationsResult.Value);
+        return locationsResult.Match(Ok, Problem);
     }
 
 
@@ -45,11 +40,9 @@ public class LocationsController(ISender sender) : ControllerBase
     {
         var createResult = await sender.Send(request, cancellationToken);
 
-        return createResult.IsFailure
-            ? BadRequest(createResult.Error)
-            : CreatedAtAction(
-                nameof(GetById),
-                createResult.Value!);
+        return createResult.Match(value =>
+            CreatedAtAction(nameof(GetById), value),
+            Problem);
     }
 
     [HttpPost("{id:guid}/activate")]
@@ -73,7 +66,7 @@ public class LocationsController(ISender sender) : ControllerBase
 
         var deleteResult = await sender.Send(request, cancellationToken);
 
-        return deleteResult.IsSuccess ? NoContent() : Problem(deleteResult.Error.Description);
+        return deleteResult.Match(NoContent, Problem);
     }
 
 
