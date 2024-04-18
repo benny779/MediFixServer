@@ -19,7 +19,7 @@ builder.Services.AddControllers()
         options.JsonSerializerOptions.AllowTrailingCommas = true;
 
         options.JsonSerializerOptions.Converters.Add(new StronglyTypedIdJsonConverterFactory());
-        options.JsonSerializerOptions.Converters.Add(new JsonEnumConverterFactory());
+        options.JsonSerializerOptions.Converters.Add(new JsonEnumConverterFactory(compareValueAndName: false));
     });
 
 
