@@ -1,4 +1,5 @@
 using MediFix.Api.Configurations;
+using MediFix.Api.Middleware;
 using MediFix.Application;
 using MediFix.Domain.Core.Primitives;
 using MediFix.Infrastructure;
@@ -26,6 +27,9 @@ builder.Services.AddControllers()
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
