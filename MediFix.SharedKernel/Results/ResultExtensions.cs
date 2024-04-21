@@ -17,4 +17,9 @@ public static class ResultExtensions
     {
         return result.IsSuccess ? onSuccess(result.Value) : onFailure(result.Error);
     }
+
+    public static Task<Result<T>> AsTask<T>(this Result<T> result)
+    {
+        return Task.FromResult(result);
+    }
 }
