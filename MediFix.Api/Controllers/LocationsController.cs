@@ -4,6 +4,7 @@ using MediFix.Application.Locations.CreateLocation;
 using MediFix.Application.Locations.DeleteLocation;
 using MediFix.Application.Locations.GetLocation;
 using MediFix.Application.Locations.GetLocationChildren;
+using MediFix.Application.Locations.GetLocationsByType;
 using MediFix.Application.Locations.GetLocationTypes;
 using MediFix.Application.Locations.SetActiveStatus;
 using MediFix.Domain.Locations;
@@ -18,6 +19,16 @@ public class LocationsController(ISender sender) : ApiController
     public async Task<IActionResult> GetLocationTypes(CancellationToken cancellationToken)
     {
         var query = new GetLocationTypesRequest();
+
+        var result = await sender.Send(query, cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+    [HttpGet("types/{locationType:int}")]
+    public async Task<IActionResult> GetByLocationType(byte locationType, CancellationToken cancellationToken)
+    {
+        var query = new GetLocationsByTypeRequest((LocationType)locationType);
 
         var result = await sender.Send(query, cancellationToken);
 

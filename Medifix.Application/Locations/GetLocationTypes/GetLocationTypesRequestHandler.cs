@@ -18,6 +18,5 @@ internal sealed class GetLocationTypesRequestHandler : IQueryHandler<
         var response = new GetLocationTypesResponse(locationTypes);
 
         return Result.Success(response).AsTask();
-        //return Task.FromResult(Result.Success(response));
     }
 }

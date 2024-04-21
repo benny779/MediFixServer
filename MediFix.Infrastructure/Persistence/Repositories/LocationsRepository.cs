@@ -9,6 +9,23 @@ namespace MediFix.Infrastructure.Persistence.Repositories;
 public class LocationsRepository(ApplicationDbContext dbContext)
     : Repository<Location, LocationId>(dbContext), ILocationsRepository
 {
+    public async Task<Result<List<Location>>> GetByType(LocationType locationType, CancellationToken cancellationToken = default)
+    {
+        var locations = await dbContext
+            .Locations
+            .Where(loc => loc.LocationType == locationType)
+            .ToListAsync(cancellationToken);
+
+        if (locations.IsEmpty())
+        {
+            return Error.NotFound(
+                "Locations.Type.NotFound",
+                $"No location with found for the location type '{locationType}'");
+        }
+
+        return locations;
+    }
+
     public async Task<Result<List<Location>>> GetByIdWithParentsAsync(LocationId locationId, CancellationToken cancellationToken = default)
     {
         string query = $"""
