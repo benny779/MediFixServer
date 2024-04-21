@@ -52,7 +52,7 @@ internal sealed class ChangeLocationNameCommandHandler(
     }
 
     private static Error SameTypeAndNameAlreadyExist(LocationType locationType, string name) =>
-        Error.Validation(
+        Error.Conflict(
             "Location.SameTypeAndNameAlreadyExist",
             $"A location of type '{locationType}' and the name '{name}' already exists.");
 }
