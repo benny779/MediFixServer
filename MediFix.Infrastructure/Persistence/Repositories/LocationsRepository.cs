@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace MediFix.Infrastructure.Persistence.Repositories;
 
-public class LocationsRepository(ApplicationDbContext dbContext) 
+public class LocationsRepository(ApplicationDbContext dbContext)
     : Repository<Location, LocationId>(dbContext), ILocationsRepository
 {
     public async Task<Result<List<Location>>> GetByIdWithParentsAsync(LocationId locationId, CancellationToken cancellationToken = default)
@@ -55,5 +55,17 @@ public class LocationsRepository(ApplicationDbContext dbContext)
         }
 
         return locations;
+    }
+
+    public async Task<Result<bool>> SameTypeAndNameAlreadyExist(Location location, CancellationToken cancellationToken = default)
+    {
+        var locations = await dbContext
+            .Locations
+            .Where(loc => loc.Id != location.Id &&
+                          loc.LocationType == location.LocationType &&
+                          loc.Name.Equals(location.Name))
+            .ToListAsync(cancellationToken);
+
+        return locations.Count > 0;
     }
 }

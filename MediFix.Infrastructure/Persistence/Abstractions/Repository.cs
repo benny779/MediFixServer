@@ -43,4 +43,9 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
 
         return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<TEntity>(id);
     }
+
+    public IQueryable<TEntity> GetQueryable()
+    {
+        return dbContext.Set<TEntity>();
+    }
 }

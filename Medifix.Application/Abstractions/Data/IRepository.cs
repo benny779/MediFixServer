@@ -11,4 +11,6 @@ public interface IRepository<TEntity, in TId>
     void Update(TEntity entity);
     void Delete(TEntity entity);
     Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default);
+
+    IQueryable<TEntity> GetQueryable();
 }

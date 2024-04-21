@@ -30,6 +30,11 @@ public class Location : Entity<LocationId>
         string name,
         Location? parent = null)
     {
+        if (!IsValidName(name))
+        {
+            return ErrorInvalidName;
+        }
+
         if (locationType == LocationType.Building)
         {
             if (parent is not null)
@@ -67,8 +72,28 @@ public class Location : Entity<LocationId>
             ParentId = parent.Id
         };
     }
+    public void SetActiveStatus(bool isActive) => IsActive = isActive;
 
-    public virtual void SetActiveStatus(bool isActive) => IsActive = isActive;
+    private static bool IsValidName(string name)
+    {
+        return !string.IsNullOrWhiteSpace(name);
+    }
+
+    private static readonly Error ErrorInvalidName =
+        Error.Validation(
+            "Location.InvalidName",
+            "A location name cannot be null or empty.");
+
+    public Result ChangeName(string name)
+    {
+        if (!IsValidName(name))
+        {
+            return ErrorInvalidName;
+        }
+        
+        Name = name;
+        return Result.Success();
+    }
 }
 
 public enum LocationType : byte

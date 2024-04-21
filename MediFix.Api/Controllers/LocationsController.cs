@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediFix.Application.Locations.ChangeLocationName;
 using MediFix.Application.Locations.CreateLocation;
 using MediFix.Application.Locations.DeleteLocation;
 using MediFix.Application.Locations.GetLocation;
@@ -45,18 +46,27 @@ public class LocationsController(ISender sender) : ApiController
             Problem);
     }
 
-    [HttpPost("{id:guid}/activate")]
-    public async Task<IActionResult> Activate(Guid id, CancellationToken cancellationToken)
+    [HttpPost("{id:guid}/active/{isActive:bool}")]
+    public async Task<IActionResult> Activate(Guid id, bool isActive, CancellationToken cancellationToken)
     {
-        return await SetActiveMode(id, true, cancellationToken);
+        var locationId = new LocationId(id);
+        var command = new SetLocationActiveStatusCommand(locationId, isActive);
+
+        var updateResult = await sender.Send(command, cancellationToken);
+
+        return updateResult.Match(Ok, Problem);
     }
 
-    [HttpPost("{id:guid}/deactivate")]
-    public async Task<IActionResult> Deactivate(Guid id, CancellationToken cancellationToken)
+    [HttpPut("{id:guid}/name/{newName}")]
+    public async Task<IActionResult> ChangeName(Guid id, string newName, CancellationToken cancellationToken)
     {
-        return await SetActiveMode(id, false, cancellationToken);
-    }
+        var locationId = new LocationId(id);
+        var query = new ChangeLocationNameCommand(locationId, newName);
 
+        var locationsResult = await sender.Send(query, cancellationToken);
+
+        return locationsResult.Match(Ok, Problem);
+    }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
@@ -90,16 +100,5 @@ public class LocationsController(ISender sender) : ApiController
         id = property?.GetValue(value);
 
         return id is not null;
-    }
-
-
-    private async Task<IActionResult> SetActiveMode(Guid id, bool isActive, CancellationToken cancellationToken)
-    {
-        var locationId = new LocationId(id);
-        var command = new SetLocationActiveStatusCommand(locationId, isActive);
-
-        var updateResult = await sender.Send(command, cancellationToken);
-
-        return updateResult.IsSuccess ? NoContent() : Problem(updateResult.Error.Description);
     }
 }
