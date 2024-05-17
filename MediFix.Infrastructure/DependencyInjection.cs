@@ -1,6 +1,6 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Locations;
-using MediFix.Application.Users;
+using MediFix.Application.Users.Entities;
 using MediFix.Infrastructure.Persistence;
 using MediFix.Infrastructure.Persistence.Abstractions;
 using MediFix.Infrastructure.Persistence.Repositories;
@@ -25,7 +25,10 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddDbContext<DbContext, ApplicationDbContext>(options =>
+        services.AddIdentityCore<ApplicationUser>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+        
+        services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("MediFix")));
 
         services.AddScoped<IUnitOfWork, UnitOfWork>();
@@ -37,7 +40,6 @@ public static class DependencyInjection
 
     private static void AddRepositories(IServiceCollection services)
     {
-        services.AddScoped<IUsersRepository, UsersRepository>();
         services.AddScoped<ILocationsRepository, LocationsRepository>();
     }
 }

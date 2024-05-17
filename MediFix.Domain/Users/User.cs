@@ -1,37 +1,16 @@
-﻿using MediFix.Domain.ServiceCalls;
+﻿namespace MediFix.Domain.Users;
 
-namespace MediFix.Domain.Users;
-
-public class User : Entity<UserId>
+public interface IDomainUser
 {
-    public const int FirstNameMaxLength = 30;
-    public const int LastNameMaxLength = 30;
+}
 
-    public string FirstName { get; private set; } = null!;
-    public string LastName { get; private set; } = null!;
-    public string Email { get; private set; } = null!;
-    public string Phone { get; private set; } = null!;
-    public string HashedPassword { get; private set; } = null!;
-
-    private User(UserId id) : base(id)
+public sealed class User : AggregateRoot<UserId>, IDomainUser
+{
+    private User()
     {
     }
 
-    public static Result<User> Create(
-        UserId id,
-        string firstName,
-        string lastName,
-        string email,
-        string phone,
-        string hashedPassword)
+    public User(UserId id) : base(id)
     {
-        return new User(id)
-        {
-            FirstName = firstName,
-            LastName = lastName,
-            Email = email,
-            Phone = phone,
-            HashedPassword = hashedPassword
-        };
     }
 }

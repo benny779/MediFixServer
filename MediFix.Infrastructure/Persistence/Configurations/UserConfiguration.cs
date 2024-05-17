@@ -8,26 +8,13 @@ internal class UserConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
+        builder.ToTable("Users");
+
         builder.HasKey(u => u.Id);
 
-        builder.Property(u => u.Id)
+        builder.Property(p => p.Id)
             .HasConversion(
-                userId => userId.Value,
+                id => id.Value,
                 value => new UserId(value));
-
-        builder.Property(u => u.FirstName)
-            .HasMaxLength(User.FirstNameMaxLength);
-
-        builder.Property(u => u.LastName)
-            .HasMaxLength(User.LastNameMaxLength);
-
-        builder.Property(u => u.Email)
-            .HasMaxLength(255);
-
-        builder.Property(u => u.Phone)
-            .HasMaxLength(10);
-
-        builder.HasIndex(u => u.Email).IsUnique();
-        builder.HasIndex(u => u.Phone).IsUnique();
     }
 }

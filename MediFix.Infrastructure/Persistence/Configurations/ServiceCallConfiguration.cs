@@ -1,6 +1,5 @@
 ﻿using MediFix.Domain.Categories;
 using MediFix.Domain.Locations;
-using MediFix.Domain.Practitioners;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
 using MediFix.Infrastructure.Persistence.Converters;
@@ -31,18 +30,6 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
 
         builder.Property(sc => sc.Status)
             .HasConversion<byte>();
-
-
-        //builder.HasOne(sc => sc.LocationId)
-        //    .WithMany()
-        //    .HasForeignKey(sc => sc.LocationId)
-        //    .IsRequired();
-
-        builder.Property(sc => sc.UserId)
-            .ValueGeneratedNever()
-            .HasConversion(
-                userId => userId.Value,
-                value => new UserId(value));
 
         builder.HasOne<User>()
             .WithMany()
@@ -75,6 +62,23 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
                 .HasConversion(
                     serviceCallId => serviceCallId.Value,
                     value => new ServiceCallId(value));
+
+            sb.HasOne<User>()
+                .WithMany()
+                .HasForeignKey(s => s.UpdatedBy)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.NoAction);
+
+            sb.Property(s => s.UpdatedBy)
+                .HasConversion(
+                    userId => userId.Value,
+                    value => new UserId(value));
+
+            sb.HasOne<Practitioner>()
+                .WithMany()
+                .HasForeignKey(s => s.PractitionerId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.NoAction);
 
             sb.Property(s => s.PractitionerId)
                 .HasConversion(
