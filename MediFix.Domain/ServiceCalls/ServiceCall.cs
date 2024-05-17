@@ -1,6 +1,5 @@
 ﻿using MediFix.Domain.Categories;
 using MediFix.Domain.Locations;
-using MediFix.Domain.Practitioners;
 using MediFix.Domain.Users;
 
 namespace MediFix.Domain.ServiceCalls;
@@ -67,14 +66,17 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             DateCreated = DateTime.Now
         };
 
-        serviceCall.SetStatus(ServiceCallStatus.New);
+        serviceCall.SetStatus(ServiceCallStatus.New, userId);
 
         // TODO: Service call created event
 
         return serviceCall;
     }
 
-    private void SetStatus(ServiceCallStatus status, PractitionerId? practitionerId = null)
+    private void SetStatus(
+        ServiceCallStatus status,
+        UserId updateUserId,
+        PractitionerId? practitionerId = null)
     {
         Status = status;
         StatusDateTime = DateTime.Now;
@@ -84,10 +86,14 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             PractitionerId = practitionerId;
         }
 
-        _statusHistory.Add(new ServiceCallStatusUpdate(Id, status, StatusDateTime, practitionerId));
+        _statusHistory.Add(new ServiceCallStatusUpdate(Id,
+            status,
+            StatusDateTime,
+            updateUserId,
+            practitionerId));
     }
 
-    public Result AssignToPractitioner(PractitionerId practitionerId)
+    public Result AssignToPractitioner(UserId updateUserId, PractitionerId practitionerId)
     {
         if (IsCancelled)
             return ServiceCallErrors.CancelledAndCannotBeAssigned;
@@ -100,7 +106,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 
         PractitionerId = practitionerId;
 
-        SetStatus(ServiceCallStatus.AssignedToPractitioner, practitionerId);
+        SetStatus(ServiceCallStatus.AssignedToPractitioner, updateUserId, practitionerId);
 
         // TODO: assign to technician event
         // if a practitioner is changed, we need to notify both practitioners
@@ -108,7 +114,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         return Result.Success();
     }
 
-    public Result Cancel()
+    public Result Cancel(UserId updateUserId)
     {
         if (IsCancelled)
             return ServiceCallErrors.AlreadyCancelled;
@@ -119,14 +125,14 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         if (Status == ServiceCallStatus.Finished)
             return ServiceCallErrors.FinishedCannotBeCancelled;
 
-        SetStatus(ServiceCallStatus.Cancelled);
+        SetStatus(ServiceCallStatus.Cancelled, updateUserId);
 
         // TODO: service call cancelled event
 
         return Result.Success();
     }
 
-    public Result Start()
+    public Result Start(UserId updateUserId)
     {
         if (IsCancelled)
             return ServiceCallErrors.Cancelled;
@@ -137,19 +143,19 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         if (Status == ServiceCallStatus.Started)
             return ServiceCallErrors.StartedCannotStart;
 
-        SetStatus(ServiceCallStatus.Started);
+        SetStatus(ServiceCallStatus.Started, updateUserId);
 
         // TODO: service call Started event
 
         return Result.Success();
     }
 
-    public Result Finish()
+    public Result Finish(UserId updateUserId)
     {
         if (Status != ServiceCallStatus.Started)
             return ServiceCallErrors.NotStarted;
 
-        SetStatus(ServiceCallStatus.Finished);
+        SetStatus(ServiceCallStatus.Finished, updateUserId);
 
         // TODO: service call finished event
 
