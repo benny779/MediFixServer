@@ -5,7 +5,7 @@ namespace MediFix.Api.Configurations;
 
 public record JsonEnum(int Value, string Name);
 
-public class JsonEnumConverter<TEnum>(bool compareValueAndName) : JsonConverter<TEnum>
+internal class JsonEnumConverter<TEnum>(bool compareValueAndName) : JsonConverter<TEnum>
     where TEnum : Enum
 {
     public override TEnum Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)

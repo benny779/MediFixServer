@@ -4,16 +4,19 @@ using MediFix.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace MediFix.Infrastructure.Migrations
+namespace MediFix.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240602120121_InitialCreate")]
+    partial class InitialCreate
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,8 +42,8 @@ namespace MediFix.Infrastructure.Migrations
 
             modelBuilder.Entity("MediFix.Application.Users.Entities.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -89,11 +92,21 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<bool>("PhoneNumberConfirmed")
                         .HasColumnType("bit");
 
+                    b.Property<string>("RefreshToken")
+                        .HasMaxLength(450)
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTime?>("RefreshTokenValidity")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
+
+                    b.Property<byte>("Type")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
@@ -132,12 +145,12 @@ namespace MediFix.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"),
+                            Id = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
                             Name = "Plumbing"
                         },
                         new
                         {
-                            Id = new Guid("9b6cd8c3-0953-47ac-84e4-12e6e14ea139"),
+                            Id = new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"),
                             Name = "Air conditioning"
                         });
                 });
@@ -162,37 +175,37 @@ namespace MediFix.Infrastructure.Migrations
                     b.HasIndex("Name", "CategoryId")
                         .IsUnique();
 
-                    b.ToTable("SubCategory");
+                    b.ToTable("SubCategories");
 
                     b.HasData(
                         new
                         {
-                            Id = new Guid("d480b772-0e4b-4bca-9e76-21b76d6cf063"),
-                            CategoryId = new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"),
+                            Id = new Guid("965b3ac8-1893-4059-a274-cf38d51b5ea5"),
+                            CategoryId = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
                             Name = "Toilet"
                         },
                         new
                         {
-                            Id = new Guid("fe509933-cacb-4408-8d46-a6bb93bfb797"),
-                            CategoryId = new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"),
+                            Id = new Guid("f88b5c4f-a308-46ce-a4eb-3cc3e4fe3adc"),
+                            CategoryId = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
                             Name = "Tap"
                         },
                         new
                         {
-                            Id = new Guid("28ccc01c-aa51-46e2-8ecf-cbaece648e5b"),
-                            CategoryId = new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"),
+                            Id = new Guid("92ecb6ac-6f0e-4bc2-8d44-c93af4b1f885"),
+                            CategoryId = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
                             Name = "Water Bar"
                         },
                         new
                         {
-                            Id = new Guid("07848a3e-77d8-4939-b125-d4e10e11d8cb"),
-                            CategoryId = new Guid("9b6cd8c3-0953-47ac-84e4-12e6e14ea139"),
+                            Id = new Guid("8f45b7aa-a413-4150-958a-98b628e46004"),
+                            CategoryId = new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"),
                             Name = "Air conditioner does not cool"
                         },
                         new
                         {
-                            Id = new Guid("73a9982c-e1b9-417d-b283-9d932abb5613"),
-                            CategoryId = new Guid("9b6cd8c3-0953-47ac-84e4-12e6e14ea139"),
+                            Id = new Guid("0bb18790-8338-4987-b713-d99ec536c3ef"),
+                            CategoryId = new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"),
                             Name = "Noisy air conditioner"
                         });
                 });
@@ -228,88 +241,91 @@ namespace MediFix.Infrastructure.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("c3a6d6cd-0c8d-4c2c-9535-08e301e2ec55"),
+                            Id = new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993"),
                             IsActive = true,
                             LocationType = (byte)1,
                             Name = "A"
                         },
                         new
                         {
-                            Id = new Guid("fff18b54-3f30-4b71-89f1-edebb0a9e38b"),
+                            Id = new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8"),
                             IsActive = true,
                             LocationType = (byte)2,
                             Name = "0",
-                            ParentId = new Guid("c3a6d6cd-0c8d-4c2c-9535-08e301e2ec55")
+                            ParentId = new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993")
                         },
                         new
                         {
-                            Id = new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53"),
+                            Id = new Guid("33ddc98a-7a30-4840-8910-340702848219"),
                             IsActive = true,
                             LocationType = (byte)3,
                             Name = "HR",
-                            ParentId = new Guid("fff18b54-3f30-4b71-89f1-edebb0a9e38b")
+                            ParentId = new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8")
                         },
                         new
                         {
-                            Id = new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b"),
+                            Id = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e"),
                             IsActive = true,
                             LocationType = (byte)3,
                             Name = "IT",
-                            ParentId = new Guid("fff18b54-3f30-4b71-89f1-edebb0a9e38b")
+                            ParentId = new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8")
                         },
                         new
                         {
-                            Id = new Guid("a9374dcc-fc00-4738-8a05-897159be9d7c"),
+                            Id = new Guid("6b23f02b-3e44-40b6-963b-460689c369a1"),
                             IsActive = true,
                             LocationType = (byte)4,
                             Name = "100",
-                            ParentId = new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53")
+                            ParentId = new Guid("33ddc98a-7a30-4840-8910-340702848219")
                         },
                         new
                         {
-                            Id = new Guid("7ea2940a-1376-46c9-bc99-7b539a442a1a"),
+                            Id = new Guid("c061f83b-37e6-40de-8dc3-f77442f82d1c"),
                             IsActive = true,
                             LocationType = (byte)4,
                             Name = "101",
-                            ParentId = new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53")
+                            ParentId = new Guid("33ddc98a-7a30-4840-8910-340702848219")
                         },
                         new
                         {
-                            Id = new Guid("a16f384d-e250-495a-a0e5-d5e35e4c7e8c"),
+                            Id = new Guid("5dfbbd60-2c7c-4f2d-8fc9-e93bbafc806f"),
                             IsActive = true,
                             LocationType = (byte)4,
                             Name = "102",
-                            ParentId = new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53")
+                            ParentId = new Guid("33ddc98a-7a30-4840-8910-340702848219")
                         },
                         new
                         {
-                            Id = new Guid("a32738c7-15a4-40dd-9208-06ada1dbf886"),
+                            Id = new Guid("2b488c92-b8a5-42b1-aeb2-b7dbd036b48e"),
                             IsActive = true,
                             LocationType = (byte)4,
                             Name = "200",
-                            ParentId = new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b")
+                            ParentId = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e")
                         },
                         new
                         {
-                            Id = new Guid("94870660-c5fd-4b98-afa1-1f18af8f0b24"),
+                            Id = new Guid("48a2593e-53ca-4b42-a49d-c9ac38c959a7"),
                             IsActive = true,
                             LocationType = (byte)4,
                             Name = "201",
-                            ParentId = new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b")
+                            ParentId = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e")
                         },
                         new
                         {
-                            Id = new Guid("b747784b-6b92-4b97-a9a3-13b7ff8deea6"),
+                            Id = new Guid("452050ca-d8f0-4b71-a88f-4643fdadea1d"),
                             IsActive = true,
                             LocationType = (byte)4,
                             Name = "202",
-                            ParentId = new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b")
+                            ParentId = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e")
                         });
                 });
 
             modelBuilder.Entity("MediFix.Domain.ServiceCalls.ServiceCall", b =>
                 {
                     b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("ClientId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime>("DateCreated")
@@ -322,38 +338,34 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid?>("PractitionerId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<byte>("Priority")
                         .HasColumnType("tinyint");
 
                     b.Property<byte>("ServiceCallType")
                         .HasColumnType("tinyint");
 
-                    b.Property<byte>("Status")
-                        .HasColumnType("tinyint");
-
-                    b.Property<DateTime>("StatusDateTime")
-                        .HasColumnType("datetime2");
-
                     b.Property<Guid>("SubCategoryId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("LocationId");
+                    b.HasIndex("ClientId");
 
-                    b.HasIndex("PractitionerId");
+                    b.HasIndex("LocationId");
 
                     b.HasIndex("SubCategoryId");
 
-                    b.HasIndex("UserId");
-
                     b.ToTable("ServiceCalls");
+                });
+
+            modelBuilder.Entity("MediFix.Domain.Users.Client", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Clients");
                 });
 
             modelBuilder.Entity("MediFix.Domain.Users.Expertise", b =>
@@ -379,13 +391,7 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Managers");
                 });
@@ -395,37 +401,15 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uniqueidentifier");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
 
                     b.ToTable("Practitioners");
                 });
 
-            modelBuilder.Entity("MediFix.Domain.Users.User", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Users", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("85ff9c87-dd28-4ffb-b8c4-608b29fd31f0")
-                        });
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -449,7 +433,7 @@ namespace MediFix.Infrastructure.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -460,9 +444,8 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -471,7 +454,7 @@ namespace MediFix.Infrastructure.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .HasColumnType("int");
@@ -482,9 +465,8 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -493,7 +475,7 @@ namespace MediFix.Infrastructure.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -504,9 +486,8 @@ namespace MediFix.Infrastructure.Migrations
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -515,13 +496,13 @@ namespace MediFix.Infrastructure.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -530,10 +511,10 @@ namespace MediFix.Infrastructure.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
                         .HasColumnType("nvarchar(450)");
@@ -582,25 +563,21 @@ namespace MediFix.Infrastructure.Migrations
 
             modelBuilder.Entity("MediFix.Domain.ServiceCalls.ServiceCall", b =>
                 {
+                    b.HasOne("MediFix.Domain.Users.Client", null)
+                        .WithMany()
+                        .HasForeignKey("ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MediFix.Domain.Locations.Location", null)
                         .WithMany()
                         .HasForeignKey("LocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MediFix.Domain.Users.Practitioner", null)
-                        .WithMany()
-                        .HasForeignKey("PractitionerId");
-
                     b.HasOne("MediFix.Domain.Categories.SubCategory", null)
                         .WithMany()
                         .HasForeignKey("SubCategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MediFix.Domain.Users.User", null)
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -632,8 +609,6 @@ namespace MediFix.Infrastructure.Migrations
 
                             b1.HasIndex("ServiceCallId");
 
-                            b1.HasIndex("UpdatedBy");
-
                             b1.ToTable("ServiceCallStatusUpdate");
 
                             b1.HasOne("MediFix.Domain.Users.Practitioner", null)
@@ -643,45 +618,21 @@ namespace MediFix.Infrastructure.Migrations
 
                             b1.WithOwner()
                                 .HasForeignKey("ServiceCallId");
-
-                            b1.HasOne("MediFix.Domain.Users.User", null)
-                                .WithMany()
-                                .HasForeignKey("UpdatedBy")
-                                .OnDelete(DeleteBehavior.NoAction)
-                                .IsRequired();
                         });
 
                     b.Navigation("StatusHistory");
                 });
 
-            modelBuilder.Entity("MediFix.Domain.Users.Manager", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("MediFix.Domain.Users.User", null)
-                        .WithOne()
-                        .HasForeignKey("MediFix.Domain.Users.Manager", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("MediFix.Domain.Users.Practitioner", b =>
-                {
-                    b.HasOne("MediFix.Domain.Users.User", null)
-                        .WithOne()
-                        .HasForeignKey("MediFix.Domain.Users.Practitioner", "UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("MediFix.Application.Users.Entities.ApplicationUser", null)
                         .WithMany()
@@ -690,7 +641,7 @@ namespace MediFix.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("MediFix.Application.Users.Entities.ApplicationUser", null)
                         .WithMany()
@@ -699,9 +650,9 @@ namespace MediFix.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -714,7 +665,7 @@ namespace MediFix.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("MediFix.Application.Users.Entities.ApplicationUser", null)
                         .WithMany()

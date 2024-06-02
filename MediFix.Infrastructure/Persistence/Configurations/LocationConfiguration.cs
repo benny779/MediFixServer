@@ -13,12 +13,12 @@ internal class LocationConfiguration : IEntityTypeConfiguration<Location>
         builder.Property(l => l.Id)
             .HasConversion(
                 locationId => locationId.Value,
-                value => new LocationId(value));
+                value => LocationId.From(value));
 
         builder.Property(l => l.ParentId)
             .HasConversion(
                 locationId => locationId.Value,
-                value => new LocationId(value));
+                value => LocationId.From(value));
 
         builder.Ignore(l => l.Parent);
 

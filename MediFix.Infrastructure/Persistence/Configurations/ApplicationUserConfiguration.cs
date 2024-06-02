@@ -13,5 +13,11 @@ internal class ApplicationUserConfiguration : IEntityTypeConfiguration<Applicati
 
         builder.Property(u => u.LastName)
             .HasMaxLength(ApplicationUser.LastNameMaxLength);
+
+        builder.Property(u => u.RefreshToken)
+            .HasMaxLength(450);
+
+        builder.Property(u => u.Type)
+            .HasConversion<byte>();
     }
 }

@@ -13,7 +13,7 @@ internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
         builder.Property(c => c.Id)
             .HasConversion(
                 categoryId => categoryId.Value,
-                value => new CategoryId(value));
+                value => CategoryId.From(value));
 
         builder.Property(c => c.Name)
             .HasMaxLength(Category.NameMaxLength);

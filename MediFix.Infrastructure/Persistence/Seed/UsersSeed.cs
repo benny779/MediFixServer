@@ -7,16 +7,16 @@ internal static class UsersSeed
 {
     public static ModelBuilder SeedUsers(this ModelBuilder modelBuilder)
     {
-        var users = GetUsers();
+        //var users = GetUsers();
 
-        modelBuilder.Entity<User>()
-            .HasData(users);
+        //modelBuilder.Entity<DomainUser>()
+        //    .HasData(users);
 
         return modelBuilder;
     }
 
-    private static IEnumerable<User> GetUsers()
-    {
-        return [new User(UserId.Create())];
-    }
+    //private static IEnumerable<DomainUser> GetUsers()
+    //{
+    //    return [new DomainUser(UserId.Create())];
+    //}
 }

@@ -23,6 +23,17 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
 
         return entity;
     }
+
+    public async Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default)
+    {
+        var rowsDeleted = await dbContext.Set<TEntity>()
+            .Where(l => l.Id.Equals(id))
+            .ExecuteDeleteAsync(cancellationToken);
+
+        return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<TEntity>(id);
+    }
+
+
     public void Insert(TEntity entity)
     {
         dbContext.Set<TEntity>().Add(entity);
@@ -35,15 +46,6 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     {
         dbContext.Set<TEntity>().Remove(entity);
     }
-    public async Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default)
-    {
-        var rowsDeleted = await dbContext.Set<TEntity>()
-            .Where(l => l.Id.Equals(id))
-            .ExecuteDeleteAsync(cancellationToken);
-
-        return rowsDeleted > 0 ? Result.Success() : Error.EntityNotFound<TEntity>(id);
-    }
-
     public IQueryable<TEntity> GetQueryable()
     {
         return dbContext.Set<TEntity>();

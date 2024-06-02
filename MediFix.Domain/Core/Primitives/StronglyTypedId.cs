@@ -1,4 +1,4 @@
-﻿using MediFix.SharedKernel.Results;
+﻿using MediFix.Domain.Users;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -39,7 +39,7 @@ public static class StronglyTypedIdHelper
         if (!IsStronglyTypedId(stronglyTypedIdType))
             throw new ArgumentException($"Type '{stronglyTypedIdType}' is not a strongly-typed id type", nameof(stronglyTypedIdType));
 
-        var createMethod = stronglyTypedIdType.GetMethod("Create", [typeof(TValue)]);
+        var createMethod = stronglyTypedIdType.GetMethod("From", [typeof(TValue)]);
         var ctor = stronglyTypedIdType.GetConstructor([typeof(TValue)]);
 
         if (createMethod is null && createMethod?.ReturnType != typeof(Result<TValue>))

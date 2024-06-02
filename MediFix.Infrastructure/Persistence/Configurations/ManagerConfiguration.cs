@@ -1,4 +1,5 @@
-﻿using MediFix.Domain.Users;
+﻿using MediFix.Application.Users.Entities;
+using MediFix.Domain.Users;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -8,21 +9,11 @@ internal class ManagerConfiguration : IEntityTypeConfiguration<Manager>
 {
     public void Configure(EntityTypeBuilder<Manager> builder)
     {
-        ConfigurePractitioner(builder);
-    }
+        builder.HasKey(m => m.Id);
 
-
-    private static void ConfigurePractitioner(EntityTypeBuilder<Manager> builder)
-    {
-        builder.HasKey(p => p.Id);
-
-        builder.Property(p => p.Id)
+        builder.Property(m => m.Id)
             .HasConversion(
-                practitionerId => practitionerId.Value,
-                value => new ManagerId(value));
-
-        builder.HasOne<User>()
-            .WithOne()
-            .HasForeignKey<Manager>(p => p.UserId);
+                managerId => managerId.Value,
+                value => ManagerId.From(value));
     }
 }

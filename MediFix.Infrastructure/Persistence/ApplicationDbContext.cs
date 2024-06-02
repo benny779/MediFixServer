@@ -4,13 +4,14 @@ using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
 using MediFix.Infrastructure.Persistence.Seed;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace MediFix.Infrastructure.Persistence;
 
-public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
     {
@@ -21,9 +22,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<SubCategory> SubCategories { get; set; } = null!;
     public DbSet<ServiceCall> ServiceCalls { get; set; } = null!;
-    public DbSet<Practitioner> Practitioners { get; set; } = null!;
+    public DbSet<Client> Clients { get; set; } = null!;
     public DbSet<Manager> Managers { get; set; } = null!;
+    public DbSet<Practitioner> Practitioners { get; set; } = null!;
     public DbSet<Expertise> Expertises { get; set; } = null!;
     public DbSet<Location> Locations { get; set; } = null!;
 

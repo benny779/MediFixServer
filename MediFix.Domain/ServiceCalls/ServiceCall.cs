@@ -8,7 +8,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 {
     private readonly List<ServiceCallStatusUpdate> _statusHistory = [];
 
-    public UserId UserId { get; private set; } = null!;
+    public ClientId ClientId { get; private set; } = null!;
 
     public LocationId LocationId { get; private set; } = null!;
 
@@ -16,24 +16,18 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 
     public SubCategoryId SubCategoryId { get; private set; } = null!;
 
-    public string Details { get; private set; } = null!;
-
     public ServiceCallPriority Priority { get; private set; }
 
+    public string Details { get; private set; } = null!;
+
     public DateTime DateCreated { get; private set; }
-
-    public ServiceCallStatus Status { get; private set; }
-
-    public DateTime StatusDateTime { get; private set; }
-
-    public PractitionerId? PractitionerId { get; private set; }
 
     public IReadOnlyCollection<ServiceCallStatusUpdate> StatusHistory => _statusHistory;
 
 
-
-    public bool IsAssigned => PractitionerId is not null;
-    public bool IsCancelled => Status == ServiceCallStatus.Cancelled;
+    public ServiceCallStatusUpdate CurrentStatus => _statusHistory.MaxBy(s => s.DateTime)!;
+    public bool IsAssigned => CurrentStatus.Status == ServiceCallStatus.AssignedToPractitioner;
+    public bool IsCancelled => CurrentStatus.Status == ServiceCallStatus.Cancelled;
 
 
     private ServiceCall()
@@ -45,7 +39,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
     }
 
     public static Result<ServiceCall> Create(
-        UserId userId,
+        ClientId clientId,
         LocationId locationId,
         ServiceCallType serviceCallType,
         SubCategoryId subCategoryId,
@@ -53,11 +47,13 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         ServiceCallPriority priority = ServiceCallPriority.Low)
     {
         if (string.IsNullOrEmpty(details))
-            return ServiceCallErrors.EmptyDetails;
-
-        var serviceCall = new ServiceCall(new ServiceCallId(Guid.NewGuid()))
         {
-            UserId = userId,
+            return ServiceCallErrors.EmptyDetails;
+        }
+
+        var serviceCall = new ServiceCall(ServiceCallId.Create())
+        {
+            ClientId = clientId,
             LocationId = locationId,
             ServiceCallType = serviceCallType,
             SubCategoryId = subCategoryId,
@@ -66,7 +62,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             DateCreated = DateTime.Now
         };
 
-        serviceCall.SetStatus(ServiceCallStatus.New, userId);
+        serviceCall.SetStatus(ServiceCallStatus.New, clientId);
 
         // TODO: Service call created event
 
@@ -75,36 +71,32 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 
     private void SetStatus(
         ServiceCallStatus status,
-        UserId updateUserId,
+        Guid updateUserId,
         PractitionerId? practitionerId = null)
     {
-        Status = status;
-        StatusDateTime = DateTime.Now;
-
-        if (practitionerId is not null)
-        {
-            PractitionerId = practitionerId;
-        }
-
         _statusHistory.Add(new ServiceCallStatusUpdate(Id,
             status,
-            StatusDateTime,
+            DateTime.Now,
             updateUserId,
             practitionerId));
     }
 
-    public Result AssignToPractitioner(UserId updateUserId, PractitionerId practitionerId)
+    public Result AssignToPractitioner(Guid updateUserId, PractitionerId practitionerId)
     {
         if (IsCancelled)
+        {
             return ServiceCallErrors.CancelledAndCannotBeAssigned;
+        }
 
-        if (IsAssigned && practitionerId == PractitionerId)
+        if (IsAssigned && practitionerId == CurrentStatus.PractitionerId)
+        {
             return ServiceCallErrors.AlreadyAssigned;
+        }
 
-        if (Status == ServiceCallStatus.Started)
+        if (CurrentStatus.Status == ServiceCallStatus.Started)
+        {
             return ServiceCallErrors.StartedCannotBeAssigned;
-
-        PractitionerId = practitionerId;
+        }
 
         SetStatus(ServiceCallStatus.AssignedToPractitioner, updateUserId, practitionerId);
 
@@ -114,16 +106,22 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         return Result.Success();
     }
 
-    public Result Cancel(UserId updateUserId)
+    public Result Cancel(Guid updateUserId)
     {
         if (IsCancelled)
+        {
             return ServiceCallErrors.AlreadyCancelled;
+        }
 
-        if (Status == ServiceCallStatus.Started)
+        if (CurrentStatus.Status == ServiceCallStatus.Started)
+        {
             return ServiceCallErrors.StartedCannotBeCancelled;
+        }
 
-        if (Status == ServiceCallStatus.Finished)
+        if (CurrentStatus.Status == ServiceCallStatus.Finished)
+        {
             return ServiceCallErrors.FinishedCannotBeCancelled;
+        }
 
         SetStatus(ServiceCallStatus.Cancelled, updateUserId);
 
@@ -132,16 +130,22 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         return Result.Success();
     }
 
-    public Result Start(UserId updateUserId)
+    public Result Start(Guid updateUserId)
     {
         if (IsCancelled)
+        {
             return ServiceCallErrors.Cancelled;
+        }
 
         if (!IsAssigned)
+        {
             return ServiceCallErrors.NotAssigned;
+        }
 
-        if (Status == ServiceCallStatus.Started)
+        if (CurrentStatus.Status == ServiceCallStatus.Started)
+        {
             return ServiceCallErrors.StartedCannotStart;
+        }
 
         SetStatus(ServiceCallStatus.Started, updateUserId);
 
@@ -150,10 +154,12 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         return Result.Success();
     }
 
-    public Result Finish(UserId updateUserId)
+    public Result Finish(Guid updateUserId)
     {
-        if (Status != ServiceCallStatus.Started)
+        if (CurrentStatus.Status != ServiceCallStatus.Started)
+        {
             return ServiceCallErrors.NotStarted;
+        }
 
         SetStatus(ServiceCallStatus.Finished, updateUserId);
 

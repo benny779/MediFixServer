@@ -2,9 +2,8 @@
 
 public sealed class Practitioner : AggregateRoot<PractitionerId>
 {
-    public UserId UserId { get; private set; } = null!;
+    private readonly List<Expertise> _expertises = [];
 
-    private readonly HashSet<Expertise> _expertises = [];
     public IReadOnlyList<Expertise> Expertises => [.. _expertises];
 
 
@@ -12,19 +11,27 @@ public sealed class Practitioner : AggregateRoot<PractitionerId>
     {
     }
 
-    public static Result<Practitioner> Create(
-        PractitionerId practitionerId,
-        UserId userId
-    )
+    public static Result<Practitioner> Create(PractitionerId practitionerId)
     {
-        return new Practitioner(practitionerId)
-        {
-            UserId = userId
-        };
+        return new Practitioner(practitionerId);
     }
 
     public bool AddExpertise(Expertise? expertise)
-        => expertise is not null && _expertises.Add(expertise);
+    {
+        if (expertise is null)
+        {
+            return false;
+        }
+
+        if (_expertises.Exists(e => e == expertise))
+        {
+            return false;
+        }
+
+        _expertises.Add(expertise);
+
+        return true;
+    }
 
     public bool RemoveExpertise(Expertise? expertise)
         => expertise is not null && _expertises.Remove(expertise);

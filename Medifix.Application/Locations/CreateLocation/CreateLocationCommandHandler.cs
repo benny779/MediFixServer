@@ -49,7 +49,7 @@ internal sealed class CreateLocationCommandHandler(
         }
 
         var parentLocationResult = await locationsRepository.GetByIdAsync(
-            new LocationId(parentLocationId),
+            LocationId.From(parentLocationId),
             cancellationToken);
 
         return parentLocationResult.Value;

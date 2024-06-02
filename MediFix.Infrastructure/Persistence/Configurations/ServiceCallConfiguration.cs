@@ -28,12 +28,9 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
         builder.Property(sc => sc.Priority)
             .HasConversion<byte>();
 
-        builder.Property(sc => sc.Status)
-            .HasConversion<byte>();
-
-        builder.HasOne<User>()
+        builder.HasOne<Client>()
             .WithMany()
-            .HasForeignKey(sc => sc.UserId);
+            .HasForeignKey(sc => sc.ClientId);
 
         builder.HasOne<Location>()
             .WithMany()
@@ -42,37 +39,20 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
         builder.HasOne<SubCategory>()
             .WithMany()
             .HasForeignKey(sc => sc.SubCategoryId);
-
-        builder.HasOne<Practitioner>()
-            .WithMany()
-            .HasForeignKey(sc => sc.PractitionerId);
     }
 
     private static void ConfigureStatusHistory(EntityTypeBuilder<ServiceCall> builder)
     {
         builder.OwnsMany(sc => sc.StatusHistory, sb =>
         {
-            sb.HasKey(s => s.Id);
+            sb.HasKey(s => new { s.ServiceCallId, s.DateTime });
 
-            sb.Property(s => s.Id).UseIdentityColumn();
-
-            sb.WithOwner().HasForeignKey(u => u.ServiceCallId);
+            sb.WithOwner().HasForeignKey(s => s.ServiceCallId);
 
             sb.Property(s => s.ServiceCallId)
                 .HasConversion(
                     serviceCallId => serviceCallId.Value,
-                    value => new ServiceCallId(value));
-
-            sb.HasOne<User>()
-                .WithMany()
-                .HasForeignKey(s => s.UpdatedBy)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.NoAction);
-
-            sb.Property(s => s.UpdatedBy)
-                .HasConversion(
-                    userId => userId.Value,
-                    value => new UserId(value));
+                    value => ServiceCallId.From(value));
 
             sb.HasOne<Practitioner>()
                 .WithMany()
@@ -83,7 +63,7 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
             sb.Property(s => s.PractitionerId)
                 .HasConversion(
                     practitionerId => practitionerId.Value,
-                    value => new PractitionerId(value));
+                    value => PractitionerId.From(value));
 
             sb.Property(s => s.Status)
                 .HasConversion<byte>();

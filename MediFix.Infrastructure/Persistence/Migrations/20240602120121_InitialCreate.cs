@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace MediFix.Infrastructure.Migrations
+namespace MediFix.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
     public partial class InitialCreate : Migration
@@ -17,7 +17,7 @@ namespace MediFix.Infrastructure.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -31,9 +31,12 @@ namespace MediFix.Infrastructure.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Type = table.Column<byte>(type: "tinyint", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(450)", maxLength: 450, nullable: true),
+                    RefreshTokenValidity = table.Column<DateTime>(type: "datetime2", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -64,6 +67,17 @@ namespace MediFix.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Clients",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Clients", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,14 +113,25 @@ namespace MediFix.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Managers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Managers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Practitioners",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Practitioners", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -114,7 +139,7 @@ namespace MediFix.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -134,7 +159,7 @@ namespace MediFix.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
@@ -156,7 +181,7 @@ namespace MediFix.Infrastructure.Migrations
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -173,8 +198,8 @@ namespace MediFix.Infrastructure.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -197,7 +222,7 @@ namespace MediFix.Infrastructure.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
@@ -214,7 +239,7 @@ namespace MediFix.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "SubCategory",
+                name: "SubCategories",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -223,47 +248,11 @@ namespace MediFix.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_SubCategory", x => x.Id);
+                    table.PrimaryKey("PK_SubCategories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_SubCategory_Categories_CategoryId",
+                        name: "FK_SubCategories_Categories_CategoryId",
                         column: x => x.CategoryId,
                         principalTable: "Categories",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Managers",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Managers", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Managers_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Practitioners",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Practitioners", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Practitioners_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -297,20 +286,23 @@ namespace MediFix.Infrastructure.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    ClientId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     LocationId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ServiceCallType = table.Column<byte>(type: "tinyint", nullable: false),
                     SubCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Priority = table.Column<byte>(type: "tinyint", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
-                    StatusDateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    PractitionerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
+                    Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ServiceCalls", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServiceCalls_Clients_ClientId",
+                        column: x => x.ClientId,
+                        principalTable: "Clients",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ServiceCalls_Locations_LocationId",
                         column: x => x.LocationId,
@@ -318,20 +310,9 @@ namespace MediFix.Infrastructure.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ServiceCalls_Practitioners_PractitionerId",
-                        column: x => x.PractitionerId,
-                        principalTable: "Practitioners",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_ServiceCalls_SubCategory_SubCategoryId",
+                        name: "FK_ServiceCalls_SubCategories_SubCategoryId",
                         column: x => x.SubCategoryId,
-                        principalTable: "SubCategory",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ServiceCalls_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
+                        principalTable: "SubCategories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -362,11 +343,6 @@ namespace MediFix.Infrastructure.Migrations
                         principalTable: "ServiceCalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ServiceCallStatusUpdate_Users_UpdatedBy",
-                        column: x => x.UpdatedBy,
-                        principalTable: "Users",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.InsertData(
@@ -374,35 +350,29 @@ namespace MediFix.Infrastructure.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"), "Plumbing" },
-                    { new Guid("9b6cd8c3-0953-47ac-84e4-12e6e14ea139"), "Air conditioning" }
+                    { new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"), "Air conditioning" },
+                    { new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Plumbing" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Locations",
                 columns: new[] { "Id", "IsActive", "LocationType", "Name", "ParentId" },
-                values: new object[] { new Guid("c3a6d6cd-0c8d-4c2c-9535-08e301e2ec55"), true, (byte)1, "A", null });
+                values: new object[,]
+                {
+                    { new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993"), true, (byte)1, "A", null },
+                    { new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8"), true, (byte)2, "0", new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993") }
+                });
 
             migrationBuilder.InsertData(
-                table: "Users",
-                column: "Id",
-                value: new Guid("85ff9c87-dd28-4ffb-b8c4-608b29fd31f0"));
-
-            migrationBuilder.InsertData(
-                table: "Locations",
-                columns: new[] { "Id", "IsActive", "LocationType", "Name", "ParentId" },
-                values: new object[] { new Guid("fff18b54-3f30-4b71-89f1-edebb0a9e38b"), true, (byte)2, "0", new Guid("c3a6d6cd-0c8d-4c2c-9535-08e301e2ec55") });
-
-            migrationBuilder.InsertData(
-                table: "SubCategory",
+                table: "SubCategories",
                 columns: new[] { "Id", "CategoryId", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("07848a3e-77d8-4939-b125-d4e10e11d8cb"), new Guid("9b6cd8c3-0953-47ac-84e4-12e6e14ea139"), "Air conditioner does not cool" },
-                    { new Guid("28ccc01c-aa51-46e2-8ecf-cbaece648e5b"), new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"), "Water Bar" },
-                    { new Guid("73a9982c-e1b9-417d-b283-9d932abb5613"), new Guid("9b6cd8c3-0953-47ac-84e4-12e6e14ea139"), "Noisy air conditioner" },
-                    { new Guid("d480b772-0e4b-4bca-9e76-21b76d6cf063"), new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"), "Toilet" },
-                    { new Guid("fe509933-cacb-4408-8d46-a6bb93bfb797"), new Guid("8ff96170-d696-41c1-911a-1b9ae24b1fe6"), "Tap" }
+                    { new Guid("0bb18790-8338-4987-b713-d99ec536c3ef"), new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"), "Noisy air conditioner" },
+                    { new Guid("8f45b7aa-a413-4150-958a-98b628e46004"), new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"), "Air conditioner does not cool" },
+                    { new Guid("92ecb6ac-6f0e-4bc2-8d44-c93af4b1f885"), new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Water Bar" },
+                    { new Guid("965b3ac8-1893-4059-a274-cf38d51b5ea5"), new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Toilet" },
+                    { new Guid("f88b5c4f-a308-46ce-a4eb-3cc3e4fe3adc"), new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Tap" }
                 });
 
             migrationBuilder.InsertData(
@@ -410,14 +380,14 @@ namespace MediFix.Infrastructure.Migrations
                 columns: new[] { "Id", "IsActive", "LocationType", "Name", "ParentId" },
                 values: new object[,]
                 {
-                    { new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b"), true, (byte)3, "IT", new Guid("fff18b54-3f30-4b71-89f1-edebb0a9e38b") },
-                    { new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53"), true, (byte)3, "HR", new Guid("fff18b54-3f30-4b71-89f1-edebb0a9e38b") },
-                    { new Guid("7ea2940a-1376-46c9-bc99-7b539a442a1a"), true, (byte)4, "101", new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53") },
-                    { new Guid("94870660-c5fd-4b98-afa1-1f18af8f0b24"), true, (byte)4, "201", new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b") },
-                    { new Guid("a16f384d-e250-495a-a0e5-d5e35e4c7e8c"), true, (byte)4, "102", new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53") },
-                    { new Guid("a32738c7-15a4-40dd-9208-06ada1dbf886"), true, (byte)4, "200", new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b") },
-                    { new Guid("a9374dcc-fc00-4738-8a05-897159be9d7c"), true, (byte)4, "100", new Guid("eae8082b-5759-4be8-ae95-433f7bc26a53") },
-                    { new Guid("b747784b-6b92-4b97-a9a3-13b7ff8deea6"), true, (byte)4, "202", new Guid("be2a5d40-61c7-45e9-a0b3-69b7110bf03b") }
+                    { new Guid("33ddc98a-7a30-4840-8910-340702848219"), true, (byte)3, "HR", new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8") },
+                    { new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e"), true, (byte)3, "IT", new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8") },
+                    { new Guid("2b488c92-b8a5-42b1-aeb2-b7dbd036b48e"), true, (byte)4, "200", new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e") },
+                    { new Guid("452050ca-d8f0-4b71-a88f-4643fdadea1d"), true, (byte)4, "202", new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e") },
+                    { new Guid("48a2593e-53ca-4b42-a49d-c9ac38c959a7"), true, (byte)4, "201", new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e") },
+                    { new Guid("5dfbbd60-2c7c-4f2d-8fc9-e93bbafc806f"), true, (byte)4, "102", new Guid("33ddc98a-7a30-4840-8910-340702848219") },
+                    { new Guid("6b23f02b-3e44-40b6-963b-460689c369a1"), true, (byte)4, "100", new Guid("33ddc98a-7a30-4840-8910-340702848219") },
+                    { new Guid("c061f83b-37e6-40de-8dc3-f77442f82d1c"), true, (byte)4, "101", new Guid("33ddc98a-7a30-4840-8910-340702848219") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -483,21 +453,14 @@ namespace MediFix.Infrastructure.Migrations
                 column: "ParentId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Managers_UserId",
-                table: "Managers",
-                column: "UserId",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_PractitionerExpertise_PractitionersId",
                 table: "PractitionerExpertise",
                 column: "PractitionersId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Practitioners_UserId",
-                table: "Practitioners",
-                column: "UserId",
-                unique: true);
+                name: "IX_ServiceCalls_ClientId",
+                table: "ServiceCalls",
+                column: "ClientId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceCalls_LocationId",
@@ -505,19 +468,9 @@ namespace MediFix.Infrastructure.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceCalls_PractitionerId",
-                table: "ServiceCalls",
-                column: "PractitionerId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ServiceCalls_SubCategoryId",
                 table: "ServiceCalls",
                 column: "SubCategoryId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ServiceCalls_UserId",
-                table: "ServiceCalls",
-                column: "UserId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ServiceCallStatusUpdate_PractitionerId",
@@ -530,18 +483,13 @@ namespace MediFix.Infrastructure.Migrations
                 column: "ServiceCallId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ServiceCallStatusUpdate_UpdatedBy",
-                table: "ServiceCallStatusUpdate",
-                column: "UpdatedBy");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_SubCategory_CategoryId",
-                table: "SubCategory",
+                name: "IX_SubCategories_CategoryId",
+                table: "SubCategories",
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_SubCategory_Name_CategoryId",
-                table: "SubCategory",
+                name: "IX_SubCategories_Name_CategoryId",
+                table: "SubCategories",
                 columns: new[] { "Name", "CategoryId" },
                 unique: true);
         }
@@ -583,19 +531,19 @@ namespace MediFix.Infrastructure.Migrations
                 name: "Expertises");
 
             migrationBuilder.DropTable(
+                name: "Practitioners");
+
+            migrationBuilder.DropTable(
                 name: "ServiceCalls");
+
+            migrationBuilder.DropTable(
+                name: "Clients");
 
             migrationBuilder.DropTable(
                 name: "Locations");
 
             migrationBuilder.DropTable(
-                name: "Practitioners");
-
-            migrationBuilder.DropTable(
-                name: "SubCategory");
-
-            migrationBuilder.DropTable(
-                name: "Users");
+                name: "SubCategories");
 
             migrationBuilder.DropTable(
                 name: "Categories");

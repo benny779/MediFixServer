@@ -1,9 +1,8 @@
 using MediFix.Api.Configurations;
 using MediFix.Api.Middleware;
 using MediFix.Application;
-using MediFix.Domain.Core.Primitives;
 using MediFix.Infrastructure;
-using System.Text.Json;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,16 +11,15 @@ builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers()
-    .AddJsonOptions(options =>
-    {
-        options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-        options.JsonSerializerOptions.PropertyNameCaseInsensitive = true;
-        options.JsonSerializerOptions.AllowTrailingCommas = true;
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer();
 
-        options.JsonSerializerOptions.Converters.Add(new StronglyTypedIdJsonConverterFactory());
-        options.JsonSerializerOptions.Converters.Add(new JsonEnumConverterFactory(compareValueAndName: false));
-    });
+builder.Services.AddCustomConfigureOptions();
+
+builder.Services
+    .AddControllers()
+    .AddJsonOptions(JsonConfiguration.SetJsonOptions);
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -42,6 +40,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

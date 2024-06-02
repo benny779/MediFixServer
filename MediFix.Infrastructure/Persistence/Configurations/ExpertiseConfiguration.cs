@@ -13,7 +13,7 @@ internal class ExpertiseConfiguration : IEntityTypeConfiguration<Expertise>
         builder.Property(exp => exp.Id)
             .HasConversion(
                 expertiseId => expertiseId.Value,
-                value => new ExpertiseId(value));
+                value => ExpertiseId.From(value));
 
         builder.Property(exp => exp.Name)
             .HasMaxLength(Expertise.NameMaxLength);

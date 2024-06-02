@@ -1,4 +1,6 @@
-﻿using MediFix.SharedKernel.Results;
+﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.SharedKernel.Results;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;
@@ -36,6 +38,19 @@ public abstract class ApiController : ControllerBase
         };
 
         return Problem(statusCode: statusCode, title: error.Code, detail: error.Description);
+    }
+
+    public override CreatedAtActionResult CreatedAtAction(string? actionName, object? value)
+    {
+        if (value is ICreatedResponse created)
+        {
+            return CreatedAtAction(
+                actionName,
+                new { created.Id },
+                value);
+        }
+
+        return base.CreatedAtAction(actionName, value);
     }
 }
 

@@ -13,7 +13,7 @@ internal class SubCategoryConfiguration : IEntityTypeConfiguration<SubCategory>
         builder.Property(s => s.Id)
             .HasConversion(
                 subCategoryId => subCategoryId.Value,
-                value => new SubCategoryId(value));
+                value => SubCategoryId.From(value));
 
         builder.Property(s => s.Name)
             .HasMaxLength(SubCategory.NameMaxLength);
@@ -21,7 +21,7 @@ internal class SubCategoryConfiguration : IEntityTypeConfiguration<SubCategory>
         builder.Property(s => s.CategoryId)
             .HasConversion(
                 parentId => parentId.Value,
-                value => new CategoryId(value));
+                value => CategoryId.From(value));
 
         builder.HasOne<Category>()
             .WithMany()
