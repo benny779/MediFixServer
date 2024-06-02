@@ -1,4 +1,7 @@
-﻿namespace MediFix.SharedKernel.Results;
+﻿using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
+namespace MediFix.SharedKernel.Results;
 
 public record Error
 {
@@ -43,6 +46,30 @@ public record Error
             $"{typeof(TEntity).Name}.WithId.NotFound",
             $"The entity {typeof(TEntity).Name} with id '{id}' was not found.",
             ErrorType.NotFound);
+
+#pragma warning disable CS8777 // Parameter must have a non-null value when exiting.
+    public static Error ValueIsNull(
+        [NotNull] object? argument,
+        [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        => Validation(
+            $"Argument.Null.{paramName}",
+            $"Value cannot be null: {paramName}.");
+
+    public static Error ValueIsNullOrEmpty(
+            [NotNull] object? argument,
+            [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        => Validation(
+            $"Argument.NullOrEmpty.{paramName}",
+            $"Value cannot be null or empty: {paramName}.");
+
+    public static Error ValueIsNullOrWhiteSpace(
+        [NotNull] object? argument,
+        [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+        => Validation(
+            $"Argument.NullOrWhiteSpace.{paramName}",
+            $"Value cannot be null or white space: {paramName}.");
+#pragma warning restore CS8777 // Parameter must have a non-null value when exiting.
+
     public static Error Unauthorized(
         string code = "General.Unauthorized",
         string description = "An 'Unauthorized' error has occurred.")
