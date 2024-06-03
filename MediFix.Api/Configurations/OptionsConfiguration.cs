@@ -1,4 +1,6 @@
-﻿namespace MediFix.Api.Configurations;
+﻿using Microsoft.Extensions.Options;
+
+namespace MediFix.Api.Configurations;
 
 internal static class OptionsConfiguration
 {
@@ -8,6 +10,8 @@ internal static class OptionsConfiguration
         services.ConfigureOptions<JwtBearerOptionsSetup>();
 
         services.ConfigureOptions<SwaggerGenOptionsSetup>();
+        
+        services.ConfigureOptions<CorsOptionsSetup>();
 
         return services;
     }
