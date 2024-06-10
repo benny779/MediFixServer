@@ -26,8 +26,16 @@ public sealed class GlobalExceptionHandler : IExceptionHandler
 
         var problemDetails = new ProblemDetails
         {
-            Status = StatusCodes.Status500InternalServerError,
-            Title = "Server error"
+            Status = exception switch
+            {
+                NotImplementedException => StatusCodes.Status501NotImplemented,
+                _ => StatusCodes.Status500InternalServerError
+            },
+            Title = exception switch
+            {
+                NotImplementedException => "Not Implemented",
+                _ => "Server Error"
+            }
         };
 
         if (_webHostEnvironment.IsDevelopment())
