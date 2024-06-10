@@ -1,5 +1,4 @@
-﻿using MediFix.Domain.Users;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -15,7 +14,7 @@ namespace MediFix.Domain.Core.Primitives;
 public abstract record StronglyTypedId<TValue>(TValue Value)
     where TValue : notnull
 {
-    public override string ToString() => Value.ToString()!;
+    public sealed override string ToString() => Value.ToString()!;
 
     public static implicit operator TValue(StronglyTypedId<TValue> value) => value.Value;
 }
