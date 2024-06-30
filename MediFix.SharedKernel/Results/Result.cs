@@ -48,9 +48,12 @@ public class Result
     public static Result Success() => new(true, Error.None);
     public static Result<TResult> Success<TResult>(TResult value) => new(true, Error.None, value);
     public static Result Failure(Error error) => new(false, error);
+
 #pragma warning disable CS8604 // Possible null reference argument.
     public static Result<TResult> Failure<TResult>(Error error) => new(false, error, default);
 #pragma warning restore CS8604 // Possible null reference argument.
+
+    public static implicit operator bool(Result result) => result.IsSuccess;
 }
 
 public class Result<TValue> : Result
