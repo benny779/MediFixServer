@@ -1,12 +1,13 @@
-﻿using MediFix.Application.Abstractions.Messaging;
-using MediFix.Application.Abstractions.Services;
+﻿using MediatR;
+using MediFix.Application.Abstractions.Messaging;
+using MediFix.Application.Users.GenerateAndUpdateTokens;
 using MediFix.SharedKernel.Results;
 
 namespace MediFix.Application.Users.Login;
 
 internal sealed class LoginRequestHandler(
     IApplicationUserService applicationUserService,
-    IJwtProvider jwtProvider)
+    ISender sender)
     : ICommandHandler<LoginRequest, LoginResponse>
 {
     public async Task<Result<LoginResponse>> Handle(LoginRequest request, CancellationToken cancellationToken)
@@ -31,13 +32,17 @@ internal sealed class LoginRequestHandler(
             return Error.Unauthorized();
         }
 
-        string accessToken = jwtProvider.GenerateAccessToken(user);
-        string refreshToken = jwtProvider.GenerateRefreshToken();
+        var tokensRequest = new GenerateAndUpdateTokensCommand(user);
+        var tokensResult = await sender.Send(tokensRequest, cancellationToken);
+        if (tokensResult.IsFailure)
+        {
+            return tokensResult.Error;
+        }
 
-        bool refreshTokenUpdated = await applicationUserService.SetRefreshTokenAsync(user, refreshToken);
+        (string accessToken, string refreshToken) = tokensResult.Value!;
 
         return new LoginResponse(
             accessToken,
-            refreshTokenUpdated ? refreshToken : null);
+            refreshToken);
     }
 }

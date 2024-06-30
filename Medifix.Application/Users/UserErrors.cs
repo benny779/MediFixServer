@@ -8,8 +8,8 @@ public static class UserErrors
         => Error.Validation("Password.DoNotMatch", "The passwords do not match.");
 
     public static Error LockedOut(string email)
-        => Error.Validation("User.LockedOut", $"The user '{email}' is locked out.");
+        => Error.Unauthorized("User.LockedOut", $"The user '{email}' is locked out.");
 
     public static Error AlreadyExists(string email)
-        => Error.Validation("User.AlreadyExists", $"The user '{email}' already exists.");
+        => Error.Conflict("User.AlreadyExists", $"The user '{email}' already exists.");
 }

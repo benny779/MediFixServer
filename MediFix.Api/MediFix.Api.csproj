@@ -19,4 +19,12 @@
     <ProjectReference Include="..\MediFix.Infrastructure\MediFix.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Properties\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="C:\Users\benny\Desktop\launchSettings.json" Link="launchSettings.json" />
+  </ItemGroup>
+
 </Project>

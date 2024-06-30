@@ -7,5 +7,5 @@ public interface IJwtProvider
 {
     string GenerateAccessToken(ApplicationUser user);
     string GenerateRefreshToken();
-    ClaimsPrincipal? GetPrincipalFromExpiredToken(string token);
+    Claim? GetEmailClaim(string token);
 }

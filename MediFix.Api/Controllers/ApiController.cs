@@ -1,6 +1,5 @@
 ﻿using MediFix.Application.Abstractions.Messaging;
 using MediFix.SharedKernel.Results;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;

@@ -22,12 +22,11 @@ internal sealed class JwtProvider : IJwtProvider
     {
         var claims = new Claim[]
         {
-            new(JwtRegisteredClaimNames.Sub , user.Id.ToString()),
+            new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email!),
             new(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new(JwtRegisteredClaimNames.GivenName, user.FirstName),
-            new(JwtRegisteredClaimNames.Name, user.FullName),
-            new(ClaimTypes.Name, user.FullName),
+            new(JwtRegisteredClaimNames.Name, user.FullName)
         };
 
         var signingCredentials = new SigningCredentials(
@@ -39,7 +38,7 @@ internal sealed class JwtProvider : IJwtProvider
             _jwtOptions.Audience,
             claims,
             null,
-            DateTime.Now.AddHours(1),
+            DateTime.Now.AddMinutes(_jwtOptions.AccessTokenExpiryMinutes),
             signingCredentials);
 
         var tokenValue = new JwtSecurityTokenHandler()
@@ -56,7 +55,7 @@ internal sealed class JwtProvider : IJwtProvider
         return Convert.ToBase64String(randomNumber);
     }
 
-    public ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
+    private ClaimsPrincipal? GetPrincipalFromExpiredToken(string token)
     {
         var tokenValidationParameters = new TokenValidationParameters
         {
@@ -64,6 +63,8 @@ internal sealed class JwtProvider : IJwtProvider
             ValidateAudience = true,
             ValidateLifetime = false,
             ValidateIssuerSigningKey = true,
+            ValidIssuer = _jwtOptions.Issuer,
+            ValidAudience = _jwtOptions.Audience,
             IssuerSigningKey = _jwtOptions.GetSigningKey(),
             ClockSkew = TimeSpan.Zero
         };
@@ -73,8 +74,7 @@ internal sealed class JwtProvider : IJwtProvider
                 tokenValidationParameters,
                 out SecurityToken securityToken);
 
-        var jwtSecurityToken = securityToken as JwtSecurityToken;
-        if (jwtSecurityToken is null
+        if (securityToken is not JwtSecurityToken jwtSecurityToken
             || !jwtSecurityToken.Header.Alg.Equals(
                 SecurityAlgorithm,
                 StringComparison.InvariantCultureIgnoreCase))
@@ -83,5 +83,27 @@ internal sealed class JwtProvider : IJwtProvider
         }
 
         return principal;
+    }
+
+    private IEnumerable<Claim> GetClaimsFromExpiredToken(string token)
+    {
+        var principal = GetPrincipalFromExpiredToken(token);
+
+        return principal?.Claims ?? Enumerable.Empty<Claim>();
+    }
+
+    private static Claim? FindClaim(IEnumerable<Claim> claims, string claimType)
+    {
+        var claimsList = claims.ToList();
+
+        return claimsList.SingleOrDefault(c => c.Type.Equals(claimType))
+               ?? claimsList.SingleOrDefault(c => c.Properties.Any(p => p.Value.Equals(claimType)));
+    }
+
+    public Claim? GetEmailClaim(string token)
+    {
+        var claims = GetClaimsFromExpiredToken(token);
+
+        return FindClaim(claims, JwtRegisteredClaimNames.Email);
     }
 }

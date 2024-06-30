@@ -9,9 +9,7 @@ public interface IApplicationUserService
 
     Task<IdentityResult> CreateAsync(ApplicationUser user, string password);
 
-    Task<bool> SetRefreshTokenAsync(ApplicationUser user, string refreshToken);
-
-    Task<bool> IsRefreshTokenValidAsync(string email, string refreshToken);
+    Task<IdentityResult> SetRefreshTokenAsync(ApplicationUser user, string refreshToken);
 
     Task<SignInResult> CheckPasswordSignInAsync(ApplicationUser user, string password);
 }
