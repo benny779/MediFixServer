@@ -1,19 +1,19 @@
-﻿using MediFix.Application.Abstractions.Data;
-using MediFix.Application.Users;
+﻿using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
+using MediFix.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Options;
 
 namespace MediFix.Infrastructure.Services;
 
 internal class ApplicationUserService(
     UserManager<ApplicationUser> userManager,
     SignInManager<ApplicationUser> signInManager,
-    IApplicationUserRepository userRepository,
-    IUnitOfWork unitOfWork)
+    IOptions<JwtOptions> jwtOptions)
     : IApplicationUserService
 {
     private const bool LockoutOnFailure = false;
-    private const int RefreshTokenValidityDays = 4;
+    private readonly JwtOptions _jwtOptions = jwtOptions.Value;
 
     public Task<ApplicationUser?> FindByEmailAsync(string email)
     {
@@ -25,23 +25,13 @@ internal class ApplicationUserService(
         return userManager.CreateAsync(user, password);
     }
 
-    public async Task<bool> SetRefreshTokenAsync(ApplicationUser user, string refreshToken)
+    public Task<IdentityResult> SetRefreshTokenAsync(ApplicationUser user, string refreshToken)
     {
         user.RefreshToken = refreshToken;
-        user.RefreshTokenValidity = DateTime.Now.AddDays(RefreshTokenValidityDays);
+        user.RefreshTokenValidity = DateTime.Now.AddDays(_jwtOptions.RefreshTokenExpiryDays);
 
-        userRepository.Update(user);
-
-        return await unitOfWork.SaveChangesAsync() > 0;
+        return userManager.UpdateAsync(user);
     }
-
-    public async Task<bool> IsRefreshTokenValidAsync(string email, string refreshToken)
-    {
-        var user = await userManager.FindByEmailAsync(email);
-
-        return user is not null && user.IsRefreshTokenValid(refreshToken);
-    }
-
 
     public Task<SignInResult> CheckPasswordSignInAsync(ApplicationUser user, string password)
     {
