@@ -23,7 +23,7 @@ internal class SubCategoryConfiguration : IEntityTypeConfiguration<SubCategory>
                 parentId => parentId.Value,
                 value => CategoryId.From(value));
 
-        builder.HasOne<Category>()
+        builder.HasOne(sc => sc.Category)
             .WithMany()
             .HasForeignKey(s => s.CategoryId);
 

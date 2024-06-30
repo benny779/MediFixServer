@@ -22,8 +22,15 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
         builder.HasKey(sc => sc.Id);
 
         builder.Property(sc => sc.Id)
-            .ValueGeneratedNever()
             .HasConversion<StronglyTypedIdValueConverter<ServiceCallId, Guid>>();
+
+        builder.Property(sc => sc.Status)
+            .HasConversion<byte>();
+
+        builder.Property(sc=> sc.PractitionerId)
+            .HasConversion(
+                practitionerId => practitionerId.Value,
+                value => PractitionerId.From(value));
 
         builder.Property(sc => sc.Priority)
             .HasConversion<byte>();
@@ -39,6 +46,10 @@ internal class ServiceCallConfiguration : IEntityTypeConfiguration<ServiceCall>
         builder.HasOne<SubCategory>()
             .WithMany()
             .HasForeignKey(sc => sc.SubCategoryId);
+
+        builder.HasOne<Practitioner>()
+            .WithMany()
+            .HasForeignKey(sc => sc.PractitionerId);
     }
 
     private static void ConfigureStatusHistory(EntityTypeBuilder<ServiceCall> builder)

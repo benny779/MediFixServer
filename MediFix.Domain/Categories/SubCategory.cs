@@ -7,4 +7,6 @@ public class SubCategory(SubCategoryId id, string name, CategoryId categoryId) :
     public string Name { get; set; } = name;
 
     public CategoryId CategoryId { get; set; } = categoryId;
+
+    public Category Category { get; }
 }

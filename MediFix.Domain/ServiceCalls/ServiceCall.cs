@@ -24,6 +24,9 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 
     public IReadOnlyCollection<ServiceCallStatusUpdate> StatusHistory => _statusHistory;
 
+    public ServiceCallStatus Status { get; private set; }
+
+    public PractitionerId? PractitionerId { get; private set; }
 
     public ServiceCallStatusUpdate CurrentStatus => _statusHistory.MaxBy(s => s.DateTime)!;
     public bool IsAssigned => CurrentStatus.Status == ServiceCallStatus.AssignedToPractitioner;
@@ -59,7 +62,8 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             SubCategoryId = subCategoryId,
             Details = details,
             Priority = priority,
-            DateCreated = DateTime.Now
+            DateCreated = DateTime.Now,
+            Status = ServiceCallStatus.New
         };
 
         serviceCall.SetStatus(ServiceCallStatus.New, clientId);
@@ -74,6 +78,9 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         Guid updateUserId,
         PractitionerId? practitionerId = null)
     {
+        Status = status;
+        PractitionerId = practitionerId ?? PractitionerId;
+
         _statusHistory.Add(new ServiceCallStatusUpdate(Id,
             status,
             DateTime.Now,

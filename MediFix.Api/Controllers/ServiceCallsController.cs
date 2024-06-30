@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using MediFix.Application.ServiceCalls.CreateServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCall;
+using MediFix.Application.ServiceCalls.GetServiceCallsWithFilter;
 using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -29,5 +30,14 @@ public class ServiceCallsController(ISender sender) : ApiController
         return result.Match(value =>
             CreatedAtAction(nameof(GetById), value),
             Problem);
+    }
+
+    [AllowAnonymous]
+    [HttpGet]
+    public async Task<IActionResult> Get([FromQuery] GetServiceCallsWithFilterRequest request, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(request, cancellationToken);
+
+        return result.Match(Ok, Problem);
     }
 }
