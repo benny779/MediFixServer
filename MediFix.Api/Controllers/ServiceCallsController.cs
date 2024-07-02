@@ -32,7 +32,6 @@ public class ServiceCallsController(ISender sender) : ApiController
             Problem);
     }
 
-    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> Get([FromQuery] GetServiceCallsWithFilterRequest request, CancellationToken cancellationToken)
     {
