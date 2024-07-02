@@ -1,5 +1,3 @@
-﻿using MediFix.Domain.ServiceCalls;
+﻿namespace MediFix.Application.ServiceCalls.GetServiceCall;
 
-namespace MediFix.Application.ServiceCalls.GetServiceCall;
-
-public record GetServiceCallResponse(ServiceCall ServiceCall);
+public record GetServiceCallResponse(ServiceCallResponse ServiceCall);

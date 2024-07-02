@@ -1,6 +1,7 @@
 ﻿using MediFix.Application.Abstractions.Messaging;
 using MediFix.Domain.ServiceCalls;
 using MediFix.SharedKernel.Results;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediFix.Application.ServiceCalls.GetServiceCall;
 
@@ -10,15 +11,23 @@ internal sealed class GetServiceCallRequestHandler(
 {
     public async Task<Result<GetServiceCallResponse>> Handle(GetServiceCallRequest request, CancellationToken cancellationToken)
     {
-        var serviceCall = await serviceCallRepository.GetByIdAsync(
-            ServiceCallId.From(request.Id),
-            cancellationToken);
+        var serviceCallId = ServiceCallId.From(request.Id);
 
-        if (serviceCall.IsFailure)
+        var serviceCalls = serviceCallRepository
+            .GetQueryable()
+            .AsNoTracking()
+            .Where(sc => sc.Id == serviceCallId);
+
+        var serviceCallResponse = await serviceCallRepository
+            .ToResponse(serviceCalls)
+            .SingleOrDefaultAsync(cancellationToken);
+
+
+        if (serviceCallResponse is null)
         {
-            return serviceCall.Error;
+            return Error.EntityNotFound<ServiceCall>();
         }
 
-        return new GetServiceCallResponse(serviceCall.Value!);
+        return new GetServiceCallResponse(serviceCallResponse);
     }
 }
