@@ -22,4 +22,9 @@ public static class ResultExtensions
     {
         return Task.FromResult(result);
     }
+
+    public static bool HasFailure(this IEnumerable<Result> results)
+    {
+        return results.Any(result => result.IsFailure);
+    }
 }
