@@ -82,10 +82,10 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         PractitionerId = practitionerId ?? PractitionerId;
 
         _statusHistory.Add(new ServiceCallStatusUpdate(Id,
-            status,
+            Status,
             DateTime.Now,
             updateUserId,
-            practitionerId));
+            PractitionerId));
     }
 
     public Result AssignToPractitioner(Guid updateUserId, PractitionerId practitionerId)
