@@ -4,8 +4,8 @@ using MediFix.SharedKernel.Results;
 
 namespace MediFix.Application.Locations.GetLocationTypes;
 
-internal sealed class GetLocationTypesRequestHandler : IQueryHandler<
-    GetLocationTypesRequest, GetLocationTypesResponse>
+internal sealed class GetLocationTypesRequestHandler :
+    IQueryHandler<GetLocationTypesRequest, GetLocationTypesResponse>
 {
     public Task<Result<GetLocationTypesResponse>> Handle(
         GetLocationTypesRequest request,

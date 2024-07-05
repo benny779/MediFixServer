@@ -3,7 +3,6 @@ using MediFix.Domain.Categories;
 using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
-using MediFix.Infrastructure.Persistence.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -41,17 +40,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
 
         ConfigurePrimaryKeys(modelBuilder);
 
-        SeedData(modelBuilder);
-
         base.OnModelCreating(modelBuilder);
-    }
-
-    private void SeedData(ModelBuilder modelBuilder)
-    {
-        modelBuilder
-            .SeedLocations()
-            .SeedCategories()
-            .SeedUsers();
     }
 
     private static void ConfigurePrimaryKeys(ModelBuilder modelBuilder)

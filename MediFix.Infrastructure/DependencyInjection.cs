@@ -2,6 +2,8 @@
 using MediFix.Application.Abstractions.Services;
 using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
+using MediFix.Application.Utils.Persistence;
+using MediFix.Application.Utils.Persistence.Seed;
 using MediFix.Infrastructure.Authentication;
 using MediFix.Infrastructure.Persistence;
 using MediFix.Infrastructure.Persistence.Abstractions;
@@ -23,6 +25,8 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationUserService, ApplicationUserService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
+
+        services.AddScoped<IPersistenceService, PersistenceService>();
 
         return services;
     }

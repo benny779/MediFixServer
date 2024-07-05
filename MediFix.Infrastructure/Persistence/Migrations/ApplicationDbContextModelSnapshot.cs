@@ -138,18 +138,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("2eb1d84b-d5ec-480f-bce0-65b428979e2d"),
-                            Name = "Plumbing"
-                        },
-                        new
-                        {
-                            Id = new Guid("bf769d62-8cf1-425f-9291-ab449d55f525"),
-                            Name = "Air conditioning"
-                        });
                 });
 
             modelBuilder.Entity("MediFix.Domain.Categories.SubCategory", b =>
@@ -173,38 +161,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("SubCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("01c6d46d-bc00-4072-9884-3757d87dcde3"),
-                            CategoryId = new Guid("2eb1d84b-d5ec-480f-bce0-65b428979e2d"),
-                            Name = "Toilet"
-                        },
-                        new
-                        {
-                            Id = new Guid("9d65f34e-41a1-4075-9a37-7a00848476fa"),
-                            CategoryId = new Guid("2eb1d84b-d5ec-480f-bce0-65b428979e2d"),
-                            Name = "Tap"
-                        },
-                        new
-                        {
-                            Id = new Guid("c9616f56-84fc-42b6-b91b-44d4739e0b92"),
-                            CategoryId = new Guid("2eb1d84b-d5ec-480f-bce0-65b428979e2d"),
-                            Name = "Water Bar"
-                        },
-                        new
-                        {
-                            Id = new Guid("881b7173-023b-4817-9f52-d80d19cf1560"),
-                            CategoryId = new Guid("bf769d62-8cf1-425f-9291-ab449d55f525"),
-                            Name = "Air conditioner does not cool"
-                        },
-                        new
-                        {
-                            Id = new Guid("54b2089e-98bb-4571-955c-1e2d539102df"),
-                            CategoryId = new Guid("bf769d62-8cf1-425f-9291-ab449d55f525"),
-                            Name = "Noisy air conditioner"
-                        });
                 });
 
             modelBuilder.Entity("MediFix.Domain.Locations.Location", b =>
@@ -234,87 +190,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Locations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("9cabf4d3-b1ae-4dc1-8443-c2f937cb4c63"),
-                            IsActive = true,
-                            LocationType = (byte)1,
-                            Name = "A"
-                        },
-                        new
-                        {
-                            Id = new Guid("1d9b26c2-0a61-400c-9a91-ff4def93cac1"),
-                            IsActive = true,
-                            LocationType = (byte)2,
-                            Name = "0",
-                            ParentId = new Guid("9cabf4d3-b1ae-4dc1-8443-c2f937cb4c63")
-                        },
-                        new
-                        {
-                            Id = new Guid("05783986-ead4-40f8-bf13-d695ddeedfa8"),
-                            IsActive = true,
-                            LocationType = (byte)3,
-                            Name = "HR",
-                            ParentId = new Guid("1d9b26c2-0a61-400c-9a91-ff4def93cac1")
-                        },
-                        new
-                        {
-                            Id = new Guid("747e12bf-b008-4f4c-ab3d-4f8f2afe9a91"),
-                            IsActive = true,
-                            LocationType = (byte)3,
-                            Name = "IT",
-                            ParentId = new Guid("1d9b26c2-0a61-400c-9a91-ff4def93cac1")
-                        },
-                        new
-                        {
-                            Id = new Guid("3e6884ee-b7c4-48fb-b193-86434baa17d2"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "100",
-                            ParentId = new Guid("05783986-ead4-40f8-bf13-d695ddeedfa8")
-                        },
-                        new
-                        {
-                            Id = new Guid("87b94ce2-317c-4132-bf4e-3fb4966f4869"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "101",
-                            ParentId = new Guid("05783986-ead4-40f8-bf13-d695ddeedfa8")
-                        },
-                        new
-                        {
-                            Id = new Guid("52f20790-36d9-4da9-880c-2f90a82511c1"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "102",
-                            ParentId = new Guid("05783986-ead4-40f8-bf13-d695ddeedfa8")
-                        },
-                        new
-                        {
-                            Id = new Guid("d4b2e72e-ed5a-4506-a09e-c23f6127f179"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "200",
-                            ParentId = new Guid("747e12bf-b008-4f4c-ab3d-4f8f2afe9a91")
-                        },
-                        new
-                        {
-                            Id = new Guid("7659535b-69f0-44a3-8477-43a550652fb5"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "201",
-                            ParentId = new Guid("747e12bf-b008-4f4c-ab3d-4f8f2afe9a91")
-                        },
-                        new
-                        {
-                            Id = new Guid("a8b5ee6b-21c1-4b33-918c-141f5fb7b727"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "202",
-                            ParentId = new Guid("747e12bf-b008-4f4c-ab3d-4f8f2afe9a91")
-                        });
                 });
 
             modelBuilder.Entity("MediFix.Domain.ServiceCalls.ServiceCall", b =>

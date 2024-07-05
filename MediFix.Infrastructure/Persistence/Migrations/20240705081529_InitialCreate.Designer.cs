@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace MediFix.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240602120121_InitialCreate")]
+    [Migration("20240705081529_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -141,18 +141,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Categories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
-                            Name = "Plumbing"
-                        },
-                        new
-                        {
-                            Id = new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"),
-                            Name = "Air conditioning"
-                        });
                 });
 
             modelBuilder.Entity("MediFix.Domain.Categories.SubCategory", b =>
@@ -176,38 +164,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("SubCategories");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("965b3ac8-1893-4059-a274-cf38d51b5ea5"),
-                            CategoryId = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
-                            Name = "Toilet"
-                        },
-                        new
-                        {
-                            Id = new Guid("f88b5c4f-a308-46ce-a4eb-3cc3e4fe3adc"),
-                            CategoryId = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
-                            Name = "Tap"
-                        },
-                        new
-                        {
-                            Id = new Guid("92ecb6ac-6f0e-4bc2-8d44-c93af4b1f885"),
-                            CategoryId = new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"),
-                            Name = "Water Bar"
-                        },
-                        new
-                        {
-                            Id = new Guid("8f45b7aa-a413-4150-958a-98b628e46004"),
-                            CategoryId = new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"),
-                            Name = "Air conditioner does not cool"
-                        },
-                        new
-                        {
-                            Id = new Guid("0bb18790-8338-4987-b713-d99ec536c3ef"),
-                            CategoryId = new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"),
-                            Name = "Noisy air conditioner"
-                        });
                 });
 
             modelBuilder.Entity("MediFix.Domain.Locations.Location", b =>
@@ -237,87 +193,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .IsUnique();
 
                     b.ToTable("Locations");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993"),
-                            IsActive = true,
-                            LocationType = (byte)1,
-                            Name = "A"
-                        },
-                        new
-                        {
-                            Id = new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8"),
-                            IsActive = true,
-                            LocationType = (byte)2,
-                            Name = "0",
-                            ParentId = new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993")
-                        },
-                        new
-                        {
-                            Id = new Guid("33ddc98a-7a30-4840-8910-340702848219"),
-                            IsActive = true,
-                            LocationType = (byte)3,
-                            Name = "HR",
-                            ParentId = new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8")
-                        },
-                        new
-                        {
-                            Id = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e"),
-                            IsActive = true,
-                            LocationType = (byte)3,
-                            Name = "IT",
-                            ParentId = new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8")
-                        },
-                        new
-                        {
-                            Id = new Guid("6b23f02b-3e44-40b6-963b-460689c369a1"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "100",
-                            ParentId = new Guid("33ddc98a-7a30-4840-8910-340702848219")
-                        },
-                        new
-                        {
-                            Id = new Guid("c061f83b-37e6-40de-8dc3-f77442f82d1c"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "101",
-                            ParentId = new Guid("33ddc98a-7a30-4840-8910-340702848219")
-                        },
-                        new
-                        {
-                            Id = new Guid("5dfbbd60-2c7c-4f2d-8fc9-e93bbafc806f"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "102",
-                            ParentId = new Guid("33ddc98a-7a30-4840-8910-340702848219")
-                        },
-                        new
-                        {
-                            Id = new Guid("2b488c92-b8a5-42b1-aeb2-b7dbd036b48e"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "200",
-                            ParentId = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e")
-                        },
-                        new
-                        {
-                            Id = new Guid("48a2593e-53ca-4b42-a49d-c9ac38c959a7"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "201",
-                            ParentId = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e")
-                        },
-                        new
-                        {
-                            Id = new Guid("452050ca-d8f0-4b71-a88f-4643fdadea1d"),
-                            IsActive = true,
-                            LocationType = (byte)4,
-                            Name = "202",
-                            ParentId = new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e")
-                        });
                 });
 
             modelBuilder.Entity("MediFix.Domain.ServiceCalls.ServiceCall", b =>
@@ -338,10 +213,16 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                     b.Property<Guid>("LocationId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<Guid?>("PractitionerId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<byte>("Priority")
                         .HasColumnType("tinyint");
 
                     b.Property<byte>("ServiceCallType")
+                        .HasColumnType("tinyint");
+
+                    b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
                     b.Property<Guid>("SubCategoryId")
@@ -352,6 +233,8 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                     b.HasIndex("ClientId");
 
                     b.HasIndex("LocationId");
+
+                    b.HasIndex("PractitionerId");
 
                     b.HasIndex("SubCategoryId");
 
@@ -547,11 +430,13 @@ namespace MediFix.Infrastructure.Persistence.Migrations
 
             modelBuilder.Entity("MediFix.Domain.Categories.SubCategory", b =>
                 {
-                    b.HasOne("MediFix.Domain.Categories.Category", null)
+                    b.HasOne("MediFix.Domain.Categories.Category", "Category")
                         .WithMany()
                         .HasForeignKey("CategoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Category");
                 });
 
             modelBuilder.Entity("MediFix.Domain.Locations.Location", b =>
@@ -575,6 +460,10 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MediFix.Domain.Users.Practitioner", null)
+                        .WithMany()
+                        .HasForeignKey("PractitionerId");
+
                     b.HasOne("MediFix.Domain.Categories.SubCategory", null)
                         .WithMany()
                         .HasForeignKey("SubCategoryId")
@@ -583,18 +472,13 @@ namespace MediFix.Infrastructure.Persistence.Migrations
 
                     b.OwnsMany("MediFix.Domain.ServiceCalls.ServiceCallStatusUpdate", "StatusHistory", b1 =>
                         {
-                            b1.Property<int>("Id")
-                                .HasColumnType("int");
-
-                            SqlServerPropertyBuilderExtensions.UseIdentityColumn(b1.Property<int>("Id"));
+                            b1.Property<Guid>("ServiceCallId")
+                                .HasColumnType("uniqueidentifier");
 
                             b1.Property<DateTime>("DateTime")
                                 .HasColumnType("datetime2");
 
                             b1.Property<Guid?>("PractitionerId")
-                                .HasColumnType("uniqueidentifier");
-
-                            b1.Property<Guid>("ServiceCallId")
                                 .HasColumnType("uniqueidentifier");
 
                             b1.Property<byte>("Status")
@@ -603,11 +487,9 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                             b1.Property<Guid>("UpdatedBy")
                                 .HasColumnType("uniqueidentifier");
 
-                            b1.HasKey("Id");
+                            b1.HasKey("ServiceCallId", "DateTime");
 
                             b1.HasIndex("PractitionerId");
-
-                            b1.HasIndex("ServiceCallId");
 
                             b1.ToTable("ServiceCallStatusUpdate");
 

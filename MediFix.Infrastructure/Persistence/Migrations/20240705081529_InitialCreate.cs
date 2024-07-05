@@ -3,8 +3,6 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-#pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
-
 namespace MediFix.Infrastructure.Persistence.Migrations
 {
     /// <inheritdoc />
@@ -292,7 +290,9 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                     SubCategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Priority = table.Column<byte>(type: "tinyint", nullable: false),
                     Details = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    DateCreated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
+                    PractitionerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -310,6 +310,11 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
+                        name: "FK_ServiceCalls_Practitioners_PractitionerId",
+                        column: x => x.PractitionerId,
+                        principalTable: "Practitioners",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_ServiceCalls_SubCategories_SubCategoryId",
                         column: x => x.SubCategoryId,
                         principalTable: "SubCategories",
@@ -321,17 +326,15 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                 name: "ServiceCallStatusUpdate",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
                     ServiceCallId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Status = table.Column<byte>(type: "tinyint", nullable: false),
                     DateTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Status = table.Column<byte>(type: "tinyint", nullable: false),
                     UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     PractitionerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ServiceCallStatusUpdate", x => x.Id);
+                    table.PrimaryKey("PK_ServiceCallStatusUpdate", x => new { x.ServiceCallId, x.DateTime });
                     table.ForeignKey(
                         name: "FK_ServiceCallStatusUpdate_Practitioners_PractitionerId",
                         column: x => x.PractitionerId,
@@ -343,51 +346,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                         principalTable: "ServiceCalls",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.InsertData(
-                table: "Categories",
-                columns: new[] { "Id", "Name" },
-                values: new object[,]
-                {
-                    { new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"), "Air conditioning" },
-                    { new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Plumbing" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Locations",
-                columns: new[] { "Id", "IsActive", "LocationType", "Name", "ParentId" },
-                values: new object[,]
-                {
-                    { new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993"), true, (byte)1, "A", null },
-                    { new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8"), true, (byte)2, "0", new Guid("8024cb7c-1f1a-4bb0-8eb9-a2b8bf0a0993") }
-                });
-
-            migrationBuilder.InsertData(
-                table: "SubCategories",
-                columns: new[] { "Id", "CategoryId", "Name" },
-                values: new object[,]
-                {
-                    { new Guid("0bb18790-8338-4987-b713-d99ec536c3ef"), new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"), "Noisy air conditioner" },
-                    { new Guid("8f45b7aa-a413-4150-958a-98b628e46004"), new Guid("36abe8d9-a6bd-4c8c-a3b1-c02961648cee"), "Air conditioner does not cool" },
-                    { new Guid("92ecb6ac-6f0e-4bc2-8d44-c93af4b1f885"), new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Water Bar" },
-                    { new Guid("965b3ac8-1893-4059-a274-cf38d51b5ea5"), new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Toilet" },
-                    { new Guid("f88b5c4f-a308-46ce-a4eb-3cc3e4fe3adc"), new Guid("7a855856-dfa0-4c1f-873e-ec6ba59b7044"), "Tap" }
-                });
-
-            migrationBuilder.InsertData(
-                table: "Locations",
-                columns: new[] { "Id", "IsActive", "LocationType", "Name", "ParentId" },
-                values: new object[,]
-                {
-                    { new Guid("33ddc98a-7a30-4840-8910-340702848219"), true, (byte)3, "HR", new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8") },
-                    { new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e"), true, (byte)3, "IT", new Guid("fd12a45c-2b6c-48a5-aa26-33b11edbf0c8") },
-                    { new Guid("2b488c92-b8a5-42b1-aeb2-b7dbd036b48e"), true, (byte)4, "200", new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e") },
-                    { new Guid("452050ca-d8f0-4b71-a88f-4643fdadea1d"), true, (byte)4, "202", new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e") },
-                    { new Guid("48a2593e-53ca-4b42-a49d-c9ac38c959a7"), true, (byte)4, "201", new Guid("a4454b57-6af8-4dcc-97a2-81fc4df22d5e") },
-                    { new Guid("5dfbbd60-2c7c-4f2d-8fc9-e93bbafc806f"), true, (byte)4, "102", new Guid("33ddc98a-7a30-4840-8910-340702848219") },
-                    { new Guid("6b23f02b-3e44-40b6-963b-460689c369a1"), true, (byte)4, "100", new Guid("33ddc98a-7a30-4840-8910-340702848219") },
-                    { new Guid("c061f83b-37e6-40de-8dc3-f77442f82d1c"), true, (byte)4, "101", new Guid("33ddc98a-7a30-4840-8910-340702848219") }
                 });
 
             migrationBuilder.CreateIndex(
@@ -468,6 +426,11 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_ServiceCalls_PractitionerId",
+                table: "ServiceCalls",
+                column: "PractitionerId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_ServiceCalls_SubCategoryId",
                 table: "ServiceCalls",
                 column: "SubCategoryId");
@@ -476,11 +439,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                 name: "IX_ServiceCallStatusUpdate_PractitionerId",
                 table: "ServiceCallStatusUpdate",
                 column: "PractitionerId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ServiceCallStatusUpdate_ServiceCallId",
-                table: "ServiceCallStatusUpdate",
-                column: "ServiceCallId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_SubCategories_CategoryId",
@@ -531,9 +489,6 @@ namespace MediFix.Infrastructure.Persistence.Migrations
                 name: "Expertises");
 
             migrationBuilder.DropTable(
-                name: "Practitioners");
-
-            migrationBuilder.DropTable(
                 name: "ServiceCalls");
 
             migrationBuilder.DropTable(
@@ -541,6 +496,9 @@ namespace MediFix.Infrastructure.Persistence.Migrations
 
             migrationBuilder.DropTable(
                 name: "Locations");
+
+            migrationBuilder.DropTable(
+                name: "Practitioners");
 
             migrationBuilder.DropTable(
                 name: "SubCategories");
