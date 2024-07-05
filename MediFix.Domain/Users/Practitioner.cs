@@ -4,7 +4,7 @@ public sealed class Practitioner : AggregateRoot<PractitionerId>
 {
     private readonly List<Expertise> _expertises = [];
 
-    public IReadOnlyList<Expertise> Expertises => [.. _expertises];
+    public IReadOnlyList<Expertise> Expertises => _expertises.AsReadOnly();
 
 
     private Practitioner(PractitionerId id) : base(id)
