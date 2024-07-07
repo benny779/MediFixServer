@@ -9,6 +9,7 @@ using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Drawing;
 
 namespace MediFix.Infrastructure.Persistence;
 
@@ -53,20 +54,7 @@ internal class PersistenceService(
 
 
         // Locations
-        var buildingA = Location.Create(LocationId.Create(), LocationType.Building, "A").Value!;
-
-        var floor0 = Location.Create(LocationId.Create(), LocationType.Floor, "0", buildingA).Value!;
-
-        var depHr = Location.Create(LocationId.Create(), LocationType.Department, "HR", floor0).Value!;
-        var depIt = Location.Create(LocationId.Create(), LocationType.Department, "IT", floor0).Value!;
-
-        var room100 = Location.Create(LocationId.Create(), LocationType.Room, "100", depHr).Value!;
-        var room101 = Location.Create(LocationId.Create(), LocationType.Room, "101", depHr).Value!;
-        var room102 = Location.Create(LocationId.Create(), LocationType.Room, "102", depHr).Value!;
-
-        var room200 = Location.Create(LocationId.Create(), LocationType.Room, "200", depIt).Value!;
-        var room201 = Location.Create(LocationId.Create(), LocationType.Room, "201", depIt).Value!;
-        var room202 = Location.Create(LocationId.Create(), LocationType.Room, "202", depIt).Value!;
+        var locations = GetLocations();
 
 
         // Expertises
@@ -96,26 +84,32 @@ internal class PersistenceService(
 
 
         // ServiceCalls
-        var serviceCallNew = ServiceCall.Create(client.Id, room100.Id, ServiceCallType.Repair, cool.Id, "Not cool...").Value!;
+        var allRooms = locations
+            .Where(location => location.LocationType == LocationType.Room)
+            .ToArray();
 
-        var serviceCallFinished = ServiceCall.Create(client.Id, room201.Id, ServiceCallType.Repair, bulb.Id, "It's dark here").Value!;
+        Random.Shared.Shuffle(allRooms);
+
+        var rooms = allRooms.Take(3).ToList();
+
+        var serviceCallNew = ServiceCall.Create(client.Id, rooms[0].Id, ServiceCallType.Repair, cool.Id, "Not cool...").Value!;
+
+        var serviceCallFinished = ServiceCall.Create(client.Id, rooms[1].Id, ServiceCallType.Repair, bulb.Id, "It's dark here").Value!;
         serviceCallFinished.AssignToPractitioner(manager.Id, practitionerElectricity.Id);
         serviceCallFinished.Start(practitionerElectricity.Id);
         serviceCallFinished.Finish(practitionerElectricity.Id);
 
-        var serviceCallCancelled = ServiceCall.Create(client.Id, room200.Id, ServiceCallType.New, sockets.Id, "The sockets don't work - no electricity", ServiceCallPriority.High).Value!;
+        var serviceCallCancelled = ServiceCall.Create(client.Id, rooms[2].Id, ServiceCallType.New, sockets.Id, "The sockets don't work - no electricity", ServiceCallPriority.High).Value!;
         serviceCallCancelled.Cancel(client.Id);
 
 
 
-
         // Persist
-
         using var transaction = await unitOfWork.BeginTransactionAsync();
 
         context.Categories.AddRange(categoryPlumbing, categoryAirConditioning, categoryElectricity);
         context.SubCategories.AddRange(toilet, tap, waterBar, cool, noise, bulb, sockets);
-        context.Locations.AddRange(buildingA, floor0, depHr, depIt, room100, room101, room102, room200, room201, room202);
+        context.Locations.AddRange(locations);
         context.Expertises.AddRange(expertisePlumbing, expertiseAirConditioning, expertiseElectricity);
         context.Clients.Add(client);
         context.Managers.Add(manager);
@@ -148,6 +142,35 @@ internal class PersistenceService(
         return Result.Success();
     }
 
+
+
+    private List<Location> CreateLocations(Location? parent, LocationType type, int first, int count)
+    {
+        return Enumerable.Range(first, count)
+             .Select(x => Location.Create(LocationId.Create(), type, x.ToString(), parent).Value!)
+             .ToList();
+    }
+
+    private List<Location> GetLocations()
+    {
+        var buildings = CreateLocations(null, LocationType.Building, 1, 3)
+            .ToList();
+
+        var floors = buildings
+            .SelectMany(building => CreateLocations(building, LocationType.Floor, int.Parse(building.Name), 4))
+            .ToList();
+
+        var departments = floors
+            .SelectMany(floor => CreateLocations(floor, LocationType.Department, int.Parse(floor.Name), 4))
+            .ToList();
+
+        var rooms = departments
+            .SelectMany(dep => CreateLocations(dep, LocationType.Room, int.Parse(dep.Name) * 2 + 100, 10))
+            .ToList();
+
+
+        return [.. buildings, .. floors, .. departments, .. rooms];
+    }
 
 
     private static ApplicationUser GetApplicationUserClient()
