@@ -19,13 +19,14 @@ internal sealed class GetLocationChildrenRequestHandler(
         }
 
         var locations = locationsResult.Value!;
-        
+
         var locationType = locations
             .Select(loc => loc.LocationType)
             .FirstOrDefault();
-        
+
         var list = locations
             .Select(LocationResponse.FromDomainLocation)
+            .OrderBy(loc => loc.Name)
             .ToList();
 
         return new GetLocationChildrenResponse(locationType, list);

@@ -16,6 +16,8 @@ internal sealed class GetCategoriesRequestHandler(
             return categories.Error;
         }
 
-        return CategoriesResponse.FromDomainCategories(categories.Value!);
+        return CategoriesResponse.FromDomainCategories(
+            categories.Value!
+                .OrderBy(cat => cat.Name));
     }
 }

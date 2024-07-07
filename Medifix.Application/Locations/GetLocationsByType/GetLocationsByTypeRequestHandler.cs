@@ -23,7 +23,9 @@ internal sealed class GetLocationsByTypeRequestHandler(
                 .Select(loc => new LocationByTypeResponse(
                     loc.Id.Value,
                     loc.Name,
-                    loc.IsActive))
+                    loc.IsActive)
+                )
+                .OrderBy(loc => loc.Name)
                 .ToList());
     }
 }

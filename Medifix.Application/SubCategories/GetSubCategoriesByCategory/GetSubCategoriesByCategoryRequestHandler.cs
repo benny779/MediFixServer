@@ -26,6 +26,8 @@ internal sealed class GetSubCategoriesByCategoryRequestHandler(
                 $"No SubCategories found for the category with the id '{request.CategoryId}'.");
         }
 
-        return SubCategoriesResponse.FromDomainCategories(subCategories);
+        return SubCategoriesResponse.FromDomainCategories(
+            subCategories
+                .OrderBy(sc => sc.Name));
     }
 }
