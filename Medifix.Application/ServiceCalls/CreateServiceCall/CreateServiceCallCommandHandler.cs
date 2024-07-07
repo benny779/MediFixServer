@@ -1,7 +1,7 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Abstractions.Messaging;
-using MediFix.Application.Categories;
 using MediFix.Application.Locations;
+using MediFix.Application.SubCategories;
 using MediFix.Application.Users;
 using MediFix.Domain.Categories;
 using MediFix.Domain.Locations;

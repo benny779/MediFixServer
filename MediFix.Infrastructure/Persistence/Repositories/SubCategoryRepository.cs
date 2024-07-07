@@ -1,4 +1,4 @@
-﻿using MediFix.Application.Categories;
+﻿using MediFix.Application.SubCategories;
 using MediFix.Domain.Categories;
 using MediFix.Infrastructure.Persistence.Abstractions;
 
