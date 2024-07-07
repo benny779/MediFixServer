@@ -1,6 +1,7 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Domain.Core.Primitives;
 using Microsoft.EntityFrameworkCore;
+using static Dapper.SqlMapper;
 
 namespace MediFix.Infrastructure.Persistence.Abstractions;
 
@@ -9,6 +10,21 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     where TEntity : Entity<TId>
     where TId : class
 {
+    public async Task<Result<List<TEntity>>> GetAllAsync(CancellationToken cancellationToken)
+    {
+        List<TEntity>? entities = await dbContext
+            .Set<TEntity>()
+            .AsNoTracking()
+            .ToListAsync(cancellationToken);
+
+        if (!entities.Any())
+        {
+            return Error.NotFound($"{nameof(TEntity)}.NotFound", $"No ${nameof(TEntity)} found.");
+        }
+
+        return entities;
+    }
+
     public async Task<Result<TEntity>> GetByIdAsync(TId id, CancellationToken cancellationToken = default)
     {
         var entity = await dbContext

@@ -7,6 +7,7 @@ public interface IRepository<TEntity, in TId>
     where TEntity : Entity<TId>
     where TId : class
 {
+    Task<Result<List<TEntity>>> GetAllAsync(CancellationToken cancellationToken);
     Task<Result<TEntity>> GetByIdAsync(TId id, CancellationToken cancellationToken = default);
     Task<Result> DeleteByIdAsync(TId id, CancellationToken cancellationToken = default);
 
