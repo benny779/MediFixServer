@@ -3,6 +3,5 @@ using MediFix.Domain.Locations;
 
 namespace MediFix.Application.Locations.GetLocation;
 
-public record GetLocationRequest(
-    LocationId LocationId,
-    bool IncludeParents) : IQuery<GetLocationResponse>;
+public record GetLocationRequest(LocationId LocationId) 
+    : IQuery<LocationWithTypeResponse>;

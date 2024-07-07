@@ -25,38 +25,7 @@ public class LocationsRepository(ApplicationDbContext dbContext)
 
         return locations;
     }
-
-    public async Task<Result<List<Location>>> GetByIdWithParentsAsync(LocationId locationId, CancellationToken cancellationToken = default)
-    {
-        string query = $"""
-                         WITH cte
-                         AS
-                         (
-                            SELECT	l.Id, l.LocationType, l.Name, l.ParentId, l.IsActive
-                            FROM	dbo.Locations AS l
-                            WHERE l.Id = '{locationId.Value.ToString()}'
-                            UNION ALL
-                            SELECT	l.Id, l.LocationType, l.Name, l.ParentId, l.IsActive
-                            FROM	dbo.Locations AS l
-                            INNER JOIN cte AS c
-                            ON l.Id = c.ParentId
-                         )
-                         SELECT	cte.Id, cte.LocationType, cte.Name, cte.ParentId, cte.IsActive
-                         FROM	cte
-                         """;
-
-        var locations = await dbContext.Locations
-            .FromSqlRaw(query)
-            .ToListAsync(cancellationToken);
-
-        if (!locations.Any())
-        {
-            return Error.EntityNotFound<Location>(locationId.Value);
-        }
-
-        return locations;
-    }
-
+    
     public async Task<Result<List<Location>>> GetChildren(LocationId locationId, CancellationToken cancellationToken = default)
     {
         var locations = await dbContext

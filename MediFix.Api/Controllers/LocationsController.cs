@@ -38,10 +38,10 @@ public class LocationsController(ISender sender) : ApiController
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, [FromQuery] bool includeParents, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var locationId = LocationId.From(id);
-        var query = new GetLocationRequest(locationId, includeParents);
+        var query = new GetLocationRequest(locationId);
 
         var locationResult = await sender.Send(query, cancellationToken);
 
