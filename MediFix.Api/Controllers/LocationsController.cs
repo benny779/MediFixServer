@@ -14,18 +14,18 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;
 
-[Authorize]
+//[Authorize]
 public class LocationsController(ISender sender) : ApiController
 {
-    [HttpGet("types")]
-    public async Task<IActionResult> GetLocationTypes(CancellationToken cancellationToken)
-    {
-        var query = new GetLocationTypesRequest();
+    //[HttpGet("types")]
+    //public async Task<IActionResult> GetLocationTypes(CancellationToken cancellationToken)
+    //{
+    //    var query = new GetLocationTypesRequest();
 
-        var result = await sender.Send(query, cancellationToken);
+    //    var result = await sender.Send(query, cancellationToken);
 
-        return result.Match(Ok, Problem);
-    }
+    //    return result.Match(Ok, Problem);
+    //}
 
     [HttpGet("types/{locationType:int}")]
     public async Task<IActionResult> GetByLocationType(byte locationType, CancellationToken cancellationToken)
@@ -70,36 +70,36 @@ public class LocationsController(ISender sender) : ApiController
             Problem);
     }
 
-    [HttpPatch("{id:guid}/active/{isActive:bool}")]
-    public async Task<IActionResult> Activate(Guid id, bool isActive, CancellationToken cancellationToken)
-    {
-        var locationId = LocationId.From(id);
-        var command = new SetLocationActiveStatusCommand(locationId, isActive);
+    //[HttpPatch("{id:guid}/active/{isActive:bool}")]
+    //public async Task<IActionResult> Activate(Guid id, bool isActive, CancellationToken cancellationToken)
+    //{
+    //    var locationId = LocationId.From(id);
+    //    var command = new SetLocationActiveStatusCommand(locationId, isActive);
 
-        var updateResult = await sender.Send(command, cancellationToken);
+    //    var updateResult = await sender.Send(command, cancellationToken);
 
-        return updateResult.Match(Ok, Problem);
-    }
+    //    return updateResult.Match(Ok, Problem);
+    //}
 
-    [HttpPatch("{id:guid}/name/{newName}")]
-    public async Task<IActionResult> ChangeName(Guid id, string newName, CancellationToken cancellationToken)
-    {
-        var locationId = LocationId.From(id);
-        var query = new ChangeLocationNameCommand(locationId, newName);
+    //[HttpPatch("{id:guid}/name/{newName}")]
+    //public async Task<IActionResult> ChangeName(Guid id, string newName, CancellationToken cancellationToken)
+    //{
+    //    var locationId = LocationId.From(id);
+    //    var query = new ChangeLocationNameCommand(locationId, newName);
 
-        var locationsResult = await sender.Send(query, cancellationToken);
+    //    var locationsResult = await sender.Send(query, cancellationToken);
 
-        return locationsResult.Match(Ok, Problem);
-    }
+    //    return locationsResult.Match(Ok, Problem);
+    //}
 
-    [HttpDelete("{id:guid}")]
-    public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
-    {
-        var locationId = LocationId.From(id);
-        var request = new DeleteLocationCommand(locationId);
+    //[HttpDelete("{id:guid}")]
+    //public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
+    //{
+    //    var locationId = LocationId.From(id);
+    //    var request = new DeleteLocationCommand(locationId);
 
-        var deleteResult = await sender.Send(request, cancellationToken);
+    //    var deleteResult = await sender.Send(request, cancellationToken);
 
-        return deleteResult.Match(NoContent, Problem);
-    }
+    //    return deleteResult.Match(NoContent, Problem);
+    //}
 }

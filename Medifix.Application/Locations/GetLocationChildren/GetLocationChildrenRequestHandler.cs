@@ -3,7 +3,7 @@ using MediFix.SharedKernel.Results;
 
 namespace MediFix.Application.Locations.GetLocationChildren;
 
-internal sealed class GetLocationChildrenHandler(
+internal sealed class GetLocationChildrenRequestHandler(
     ILocationsRepository locationsRepository)
     : IQueryHandler<GetLocationChildrenRequest, GetLocationChildrenResponse>
 {
@@ -25,7 +25,7 @@ internal sealed class GetLocationChildrenHandler(
             .FirstOrDefault();
         
         var list = locations
-            .Select(LocationChildren.FromDomainLocation)
+            .Select(LocationResponse.FromDomainLocation)
             .ToList();
 
         return new GetLocationChildrenResponse(locationType, list);
