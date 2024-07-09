@@ -29,8 +29,8 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
     public PractitionerId? PractitionerId { get; private set; }
 
     public ServiceCallStatusUpdate CurrentStatus => _statusHistory.MaxBy(s => s.DateTime)!;
-    public bool IsAssigned => CurrentStatus.Status == ServiceCallStatus.AssignedToPractitioner;
-    public bool IsCancelled => CurrentStatus.Status == ServiceCallStatus.Cancelled;
+    public bool IsAssigned => Status == ServiceCallStatus.AssignedToPractitioner;
+    public bool IsCancelled => Status == ServiceCallStatus.Cancelled;
 
 
     private ServiceCall()
@@ -95,12 +95,12 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             return ServiceCallErrors.CancelledAndCannotBeAssigned;
         }
 
-        if (IsAssigned && practitionerId == CurrentStatus.PractitionerId)
+        if (IsAssigned && practitionerId == PractitionerId)
         {
             return ServiceCallErrors.AlreadyAssigned;
         }
 
-        if (CurrentStatus.Status == ServiceCallStatus.Started)
+        if (Status == ServiceCallStatus.Started)
         {
             return ServiceCallErrors.StartedCannotBeAssigned;
         }
@@ -120,12 +120,12 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             return ServiceCallErrors.AlreadyCancelled;
         }
 
-        if (CurrentStatus.Status == ServiceCallStatus.Started)
+        if (Status == ServiceCallStatus.Started)
         {
             return ServiceCallErrors.StartedCannotBeCancelled;
         }
 
-        if (CurrentStatus.Status == ServiceCallStatus.Finished)
+        if (Status == ServiceCallStatus.Finished)
         {
             return ServiceCallErrors.FinishedCannotBeCancelled;
         }
@@ -149,7 +149,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             return ServiceCallErrors.NotAssigned;
         }
 
-        if (CurrentStatus.Status == ServiceCallStatus.Started)
+        if (Status == ServiceCallStatus.Started)
         {
             return ServiceCallErrors.StartedCannotStart;
         }
@@ -163,7 +163,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 
     public Result Finish(Guid updateUserId)
     {
-        if (CurrentStatus.Status != ServiceCallStatus.Started)
+        if (Status != ServiceCallStatus.Started)
         {
             return ServiceCallErrors.NotStarted;
         }
