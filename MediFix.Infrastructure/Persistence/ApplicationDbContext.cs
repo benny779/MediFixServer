@@ -1,5 +1,6 @@
 ﻿using MediFix.Application.Users.Entities;
 using MediFix.Domain.Categories;
+using MediFix.Domain.Expertises;
 using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;

@@ -1,4 +1,4 @@
-﻿using MediFix.Domain.Users;
+﻿using MediFix.Domain.Expertises;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

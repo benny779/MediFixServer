@@ -1,4 +1,5 @@
 ﻿using MediFix.Domain.Categories;
+using MediFix.Domain.Expertises;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,5 +20,10 @@ internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .HasMaxLength(Category.NameMaxLength);
 
         builder.HasIndex(c => c.Name).IsUnique();
+
+        builder.HasMany(c => c.AllowedExpertises)
+            .WithMany(e => e.Categories)
+            .UsingEntity(join =>
+                join.ToTable($"{nameof(Category)}{nameof(Expertise)}"));
     }
 }

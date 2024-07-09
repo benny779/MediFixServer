@@ -4,12 +4,12 @@ using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
 using MediFix.Application.Utils.Persistence;
 using MediFix.Domain.Categories;
+using MediFix.Domain.Expertises;
 using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Drawing;
 
 namespace MediFix.Infrastructure.Persistence;
 
@@ -35,10 +35,20 @@ internal class PersistenceService(
 
     public async Task<Result> SeedData()
     {
+        // Expertises
+        var expertisePlumbing = new Expertise(ExpertiseId.Create(), "Plumbing");
+        var expertiseAirConditioning = new Expertise(ExpertiseId.Create(), "Air conditioning");
+        var expertiseElectricity = new Expertise(ExpertiseId.Create(), "Electricity");
+
+
         // Categories
         var categoryPlumbing = new Category(CategoryId.Create(), "Plumbing");
         var categoryAirConditioning = new Category(CategoryId.Create(), "Air conditioning");
         var categoryElectricity = new Category(CategoryId.Create(), "Electricity");
+
+        categoryPlumbing.AddExpertise(expertisePlumbing);
+        categoryAirConditioning.AddExpertise(expertiseAirConditioning);
+        categoryElectricity.AddExpertise(expertiseElectricity);
 
 
         // Sub categories
@@ -55,12 +65,6 @@ internal class PersistenceService(
 
         // Locations
         var locations = GetLocations();
-
-
-        // Expertises
-        var expertisePlumbing = new Expertise(ExpertiseId.Create(), "Plumbing");
-        var expertiseAirConditioning = new Expertise(ExpertiseId.Create(), "Air conditioning");
-        var expertiseElectricity = new Expertise(ExpertiseId.Create(), "Electricity");
 
 
         // Application users

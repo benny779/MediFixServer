@@ -1,4 +1,6 @@
-﻿namespace MediFix.Domain.Users;
+﻿using MediFix.Domain.Expertises;
+
+namespace MediFix.Domain.Users;
 
 public sealed class Practitioner : AggregateRoot<PractitionerId>
 {

@@ -1,4 +1,4 @@
-﻿namespace MediFix.Domain.Users;
+﻿namespace MediFix.Domain.Expertises;
 
 public record ExpertiseId : StronglyTypedId<Guid>
 {
