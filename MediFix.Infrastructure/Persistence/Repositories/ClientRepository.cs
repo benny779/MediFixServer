@@ -6,4 +6,10 @@ namespace MediFix.Infrastructure.Persistence.Repositories;
 
 public class ClientRepository(ApplicationDbContext dbContext) 
     : Repository<Client, ClientId>(dbContext)
-        , IClientRepository;
+        , IClientRepository
+{
+    public override IQueryable<Client> GetQueryableWithNavigation()
+    {
+        return GetQueryable();
+    }
+}

@@ -1,6 +1,7 @@
 ﻿using MediFix.Application.ServiceCalls;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Infrastructure.Persistence.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediFix.Infrastructure.Persistence.Repositories;
 
@@ -61,5 +62,12 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                             pracAppUser.Id,
                             pracAppUser.FullName)
                         : null);
+    }
+
+    public override IQueryable<ServiceCall> GetQueryableWithNavigation()
+    {
+        return dbContext
+            .ServiceCalls
+            .Include(sc => sc.StatusHistory);
     }
 }

@@ -1,7 +1,7 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Domain.Core.Primitives;
 using Microsoft.EntityFrameworkCore;
-using static Dapper.SqlMapper;
+using System.Linq.Expressions;
 
 namespace MediFix.Infrastructure.Persistence.Abstractions;
 
@@ -12,7 +12,7 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
 {
     public async Task<Result<List<TEntity>>> GetAllAsync(CancellationToken cancellationToken)
     {
-        List<TEntity>? entities = await dbContext
+        List<TEntity> entities = await dbContext
             .Set<TEntity>()
             .AsNoTracking()
             .ToListAsync(cancellationToken);
@@ -65,5 +65,27 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     public IQueryable<TEntity> GetQueryable()
     {
         return dbContext.Set<TEntity>();
+    }
+
+    public abstract IQueryable<TEntity> GetQueryableWithNavigation();
+    
+    public async Task<Result<TEntity>> GetByIdWithNavigationAsync(TId id, CancellationToken cancellationToken = default)
+    {
+        var entity = await GetQueryableWithNavigation()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(e => e.Id.Equals(id), cancellationToken);
+
+        if (entity is null)
+        {
+            return Error.EntityNotFound<TEntity>(id);
+        }
+
+        return entity;
+    }
+
+    public  Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> predicate, CancellationToken cancellationToken = default)
+    {
+        return dbContext.Set<TEntity>()
+            .AnyAsync(predicate, cancellationToken);
     }
 }

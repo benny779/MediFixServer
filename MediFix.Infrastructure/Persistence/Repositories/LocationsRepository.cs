@@ -25,7 +25,7 @@ public class LocationsRepository(ApplicationDbContext dbContext)
 
         return locations;
     }
-    
+
     public async Task<Result<List<Location>>> GetChildren(LocationId locationId, CancellationToken cancellationToken = default)
     {
         var locations = await dbContext
@@ -43,15 +43,17 @@ public class LocationsRepository(ApplicationDbContext dbContext)
         return locations;
     }
 
-    public async Task<Result<bool>> SameTypeAndNameAlreadyExist(Location location, CancellationToken cancellationToken = default)
+    public Task<bool> SameTypeAndNameAlreadyExist(Location location, CancellationToken cancellationToken = default)
     {
-        var locations = await dbContext
-            .Locations
-            .Where(loc => loc.Id != location.Id &&
-                          loc.LocationType == location.LocationType &&
-                          loc.Name.Equals(location.Name))
-            .ToListAsync(cancellationToken);
+        return ExistsAsync(loc =>
+                loc.Id != location.Id &&
+                loc.LocationType == location.LocationType &&
+                loc.Name.Equals(location.Name),
+            cancellationToken);
+    }
 
-        return locations.Count > 0;
+    public override IQueryable<Location> GetQueryableWithNavigation()
+    {
+        return GetQueryable();
     }
 }

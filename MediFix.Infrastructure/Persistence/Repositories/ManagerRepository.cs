@@ -6,4 +6,10 @@ namespace MediFix.Infrastructure.Persistence.Repositories;
 
 public class ManagerRepository(ApplicationDbContext dbContext)
     : Repository<Manager, ManagerId>(dbContext)
-        , IManagerRepository;
+        , IManagerRepository
+{
+    public override IQueryable<Manager> GetQueryableWithNavigation()
+    {
+        return GetQueryable();
+    }
+}
