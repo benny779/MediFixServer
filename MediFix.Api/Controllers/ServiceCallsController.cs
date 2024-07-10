@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediFix.Application.ServiceCalls.AssignPractitioner;
 using MediFix.Application.ServiceCalls.CreateServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCallsWithFilter;
@@ -36,6 +37,19 @@ public class ServiceCallsController(ISender sender) : ApiController
     public async Task<IActionResult> Get([FromQuery] GetServiceCallsWithFilterRequest request, CancellationToken cancellationToken)
     {
         var result = await sender.Send(request, cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+    [HttpPatch("{id:guid}/assign/{practitionerId:guid}")]
+    public async Task<IActionResult> AssignPractitioner(
+        Guid id,
+        Guid practitionerId,
+        CancellationToken cancellationToken)
+    {
+        var command = new AssignPractitionerCommand(id, practitionerId);
+
+        var result = await sender.Send(command, cancellationToken);
 
         return result.Match(Ok, Problem);
     }

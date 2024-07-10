@@ -88,7 +88,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
             PractitionerId));
     }
 
-    public Result AssignToPractitioner(Guid updateUserId, PractitionerId practitionerId)
+    public Result AssignPractitioner(Guid updateUserId, PractitionerId practitionerId)
     {
         if (IsCancelled)
         {
