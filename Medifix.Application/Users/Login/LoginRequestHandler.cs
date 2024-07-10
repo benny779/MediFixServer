@@ -39,7 +39,7 @@ internal sealed class LoginRequestHandler(
             return tokensResult.Error;
         }
 
-        (string accessToken, string refreshToken) = tokensResult.Value!;
+        (string accessToken, string refreshToken) = tokensResult.Value;
 
         return new LoginResponse(
             accessToken,

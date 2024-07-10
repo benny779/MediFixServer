@@ -19,7 +19,7 @@ internal sealed class GetLocationsByTypeRequestHandler(
 
         return new GetLocationsByTypeResponse(
             request.LocationType,
-            locationsResult.Value!
+            locationsResult.Value
                 .Select(loc => new LocationByTypeResponse(
                     loc.Id.Value,
                     loc.Name,

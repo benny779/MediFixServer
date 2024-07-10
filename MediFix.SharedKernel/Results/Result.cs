@@ -83,7 +83,7 @@ public class Result
 
 public class Result<TValue> : Result
 {
-    public TValue? Value { get; }
+    public TValue Value { get; }
 
     internal Result(bool isSuccess, Error error, TValue value)
         : base(isSuccess, error)

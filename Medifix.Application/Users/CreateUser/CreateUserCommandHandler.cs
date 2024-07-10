@@ -52,15 +52,15 @@ internal sealed class CreateUserCommandHandler(
         switch (user.Type)
         {
             case UserType.Client:
-                var client = Client.Create(ClientId.From(user.Id)).Value!;
+                var client = Client.Create(ClientId.From(user.Id)).Value;
                 clientRepository.Insert(client);
                 break;
             case UserType.Manager:
-                var manager = Manager.Create(ManagerId.From(user.Id)).Value!;
+                var manager = Manager.Create(ManagerId.From(user.Id)).Value;
                 managerRepository.Insert(manager);
                 break;
             case UserType.Practitioner:
-                var practitioner = Practitioner.Create(PractitionerId.From(user.Id)).Value!;
+                var practitioner = Practitioner.Create(PractitionerId.From(user.Id)).Value;
                 practitionerRepository.Insert(practitioner);
                 break;
             default:

@@ -27,7 +27,7 @@ internal sealed class CreateLocationCommandHandler(
             return createLocationResult.Error;
         }
 
-        var location = createLocationResult.Value!;
+        var location = createLocationResult.Value;
 
         locationsRepository.Insert(location);
         

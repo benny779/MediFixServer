@@ -19,7 +19,7 @@ internal sealed class ChangeLocationNameCommandHandler(
             return locationResult;
         }
 
-        var location = locationResult.Value!;
+        var location = locationResult.Value;
 
         if (NamesAreEqual(request, location))
         {

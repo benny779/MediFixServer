@@ -18,7 +18,7 @@ internal sealed class GetLocationChildrenRequestHandler(
             return locationsResult.Error;
         }
 
-        var locations = locationsResult.Value!;
+        var locations = locationsResult.Value;
 
         var locationType = locations
             .Select(loc => loc.LocationType)

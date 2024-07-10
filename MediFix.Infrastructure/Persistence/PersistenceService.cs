@@ -76,11 +76,11 @@ internal class PersistenceService(
 
 
         // Domain users
-        var client = Client.Create(ClientId.From(applicationUserClient.Id)).Value!;
-        var manager = Manager.Create(ManagerId.From(applicationUserManager.Id)).Value!;
-        var practitionerPlumbing = Practitioner.Create(PractitionerId.From(applicationUserPlumbing.Id)).Value!;
-        var practitionerAirConditioning = Practitioner.Create(PractitionerId.From(applicationUserAirConditioning.Id)).Value!;
-        var practitionerElectricity = Practitioner.Create(PractitionerId.From(applicationUserElectricity.Id)).Value!;
+        var client = Client.Create(ClientId.From(applicationUserClient.Id)).Value;
+        var manager = Manager.Create(ManagerId.From(applicationUserManager.Id)).Value;
+        var practitionerPlumbing = Practitioner.Create(PractitionerId.From(applicationUserPlumbing.Id)).Value;
+        var practitionerAirConditioning = Practitioner.Create(PractitionerId.From(applicationUserAirConditioning.Id)).Value;
+        var practitionerElectricity = Practitioner.Create(PractitionerId.From(applicationUserElectricity.Id)).Value;
 
         practitionerPlumbing.AddExpertise(expertisePlumbing);
         practitionerAirConditioning.AddExpertise(expertiseAirConditioning);
@@ -96,14 +96,14 @@ internal class PersistenceService(
 
         var rooms = allRooms.Take(3).ToList();
 
-        var serviceCallNew = ServiceCall.Create(client.Id, rooms[0].Id, ServiceCallType.Repair, cool.Id, "Not cool...").Value!;
+        var serviceCallNew = ServiceCall.Create(client.Id, rooms[0].Id, ServiceCallType.Repair, cool.Id, "Not cool...").Value;
 
-        var serviceCallFinished = ServiceCall.Create(client.Id, rooms[1].Id, ServiceCallType.Repair, bulb.Id, "It's dark here").Value!;
-        serviceCallFinished.AssignToPractitioner(manager.Id, practitionerElectricity.Id);
+        var serviceCallFinished = ServiceCall.Create(client.Id, rooms[1].Id, ServiceCallType.Repair, bulb.Id, "It's dark here").Value;
+        serviceCallFinished.AssignPractitioner(manager.Id, practitionerElectricity.Id);
         serviceCallFinished.Start(practitionerElectricity.Id);
         serviceCallFinished.Finish(practitionerElectricity.Id);
 
-        var serviceCallCancelled = ServiceCall.Create(client.Id, rooms[2].Id, ServiceCallType.New, sockets.Id, "The sockets don't work - no electricity", ServiceCallPriority.High).Value!;
+        var serviceCallCancelled = ServiceCall.Create(client.Id, rooms[2].Id, ServiceCallType.New, sockets.Id, "The sockets don't work - no electricity", ServiceCallPriority.High).Value;
         serviceCallCancelled.Cancel(client.Id);
 
 
@@ -151,7 +151,7 @@ internal class PersistenceService(
     private List<Location> CreateLocations(Location? parent, LocationType type, int first, int count)
     {
         return Enumerable.Range(first, count)
-             .Select(x => Location.Create(LocationId.Create(), type, x.ToString(), parent).Value!)
+             .Select(x => Location.Create(LocationId.Create(), type, x.ToString(), parent).Value)
              .ToList();
     }
 

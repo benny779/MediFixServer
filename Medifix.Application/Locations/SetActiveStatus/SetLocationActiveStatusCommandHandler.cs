@@ -18,7 +18,7 @@ internal sealed class SetLocationActiveStatusCommandHandler(
             return locationResult.Error;
         }
 
-        var location = locationResult.Value!;
+        var location = locationResult.Value;
 
         location.SetActiveStatus(request.IsActive);
 

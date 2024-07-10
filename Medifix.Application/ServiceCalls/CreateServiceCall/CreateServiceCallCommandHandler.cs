@@ -41,7 +41,7 @@ internal sealed class CreateServiceCallCommandHandler(
             return serviceCallResult.Error;
         }
 
-        var serviceCall = serviceCallResult.Value!;
+        var serviceCall = serviceCallResult.Value;
 
         serviceCallRepository.Insert(serviceCall);
 

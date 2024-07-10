@@ -40,7 +40,7 @@ internal sealed class RefreshTokenRequestHandler(
             return tokensResult.Error;
         }
 
-        (string accessToken, string refreshToken) = tokensResult.Value!;
+        (string accessToken, string refreshToken) = tokensResult.Value;
 
         return new RefreshTokenResponse(accessToken, refreshToken);
     }

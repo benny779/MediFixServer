@@ -15,6 +15,6 @@ internal sealed class GetLocationRequestHandler(
 
         return location.IsFailure
             ? location.Error
-            : LocationWithTypeResponse.FromDomainLocation(location.Value!);
+            : LocationWithTypeResponse.FromDomainLocation(location.Value);
     }
 }
