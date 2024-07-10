@@ -1,4 +1,5 @@
 ﻿using MediFix.Domain.Expertises;
+using MediFix.Domain.Users;
 
 namespace MediFix.Domain.Categories;
 
@@ -6,28 +7,23 @@ public class Category(CategoryId id, string name) : Entity<CategoryId>(id)
 {
     public const int NameMaxLength = 30;
 
-    private readonly List<Expertise> _allowedExpertises = [];
+    private readonly HashSet<Expertise> _allowedExpertises = [];
 
 
     public string Name { get; set; } = name;
-    
-    public IReadOnlyList<Expertise> AllowedExpertises => _allowedExpertises.AsReadOnly();
 
-    
+    public IReadOnlyList<Expertise> AllowedExpertises => _allowedExpertises.ToList();
+
+
     public bool AddExpertise(Expertise? expertise)
     {
-        if (expertise is null)
-        {
-            return false;
-        }
+        return expertise is not null && _allowedExpertises.Add(expertise);
+    }
 
-        if (_allowedExpertises.Exists(e => e == expertise))
-        {
-            return false;
-        }
-
-        _allowedExpertises.Add(expertise);
-
-        return true;
+    public bool IsPractitionerAllowed(Practitioner practitioner)
+    {
+        return _allowedExpertises
+            .Intersect(practitioner.Expertises)
+            .Any();
     }
 }
