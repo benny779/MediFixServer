@@ -13,21 +13,17 @@ internal sealed class GetServiceCallRequestHandler(
     {
         var serviceCallId = ServiceCallId.From(request.Id);
 
-        var serviceCalls = serviceCallRepository
-            .GetQueryable()
+        var serviceCall = await serviceCallRepository
+            .ToResponse(sc => sc.Id == serviceCallId)
             .AsNoTracking()
-            .Where(sc => sc.Id == serviceCallId);
-
-        var serviceCallResponse = await serviceCallRepository
-            .ToResponse(serviceCalls)
             .SingleOrDefaultAsync(cancellationToken);
 
 
-        if (serviceCallResponse is null)
+        if (serviceCall is null)
         {
             return Error.EntityNotFound<ServiceCall>();
         }
 
-        return new GetServiceCallResponse(serviceCallResponse);
+        return new GetServiceCallResponse(serviceCall);
     }
 }

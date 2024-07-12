@@ -2,6 +2,7 @@
 using MediFix.Domain.ServiceCalls;
 using MediFix.Infrastructure.Persistence.Abstractions;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace MediFix.Infrastructure.Persistence.Repositories;
 
@@ -9,6 +10,11 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
     : Repository<ServiceCall, ServiceCallId>(dbContext)
         , IServiceCallRepository
 {
+    public IQueryable<ServiceCallResponse> ToResponse(Expression<Func<ServiceCall, bool>> predicate)
+    {
+        return ToResponse(dbContext.ServiceCalls.Where(predicate));
+    }
+
     public IQueryable<ServiceCallResponse> ToResponse(IQueryable<ServiceCall> serviceCalls)
     {
         return from sc in serviceCalls
@@ -57,7 +63,7 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                     sc.DateCreated,
                     sc.StatusHistory.ToList(),
                     sc.CurrentStatus,
-                    pracAppUser != null 
+                    pracAppUser != null
                         ? new ServiceCallPractitioner(
                             pracAppUser.Id,
                             pracAppUser.FullName)
