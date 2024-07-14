@@ -7,13 +7,24 @@ public sealed record ValidationError(params Error[] Errors)
         ErrorType.Validation)
 {
     public static ValidationError FromResults(IEnumerable<Result> results) =>
-        new(results.Where(r => r.IsFailure).SelectMany(r =>
+        new(results.Where(r => r.IsFailure).SelectMany(result =>
         {
-            if (r.Error is ValidationError v)
+            if (result.Error is ValidationError validationError)
             {
-                return v.Errors;
+                return validationError.Errors;
             }
 
-            return [r.Error];
+            return [result.Error];
+        }).ToArray());
+
+    public static ValidationError FromErrors(IEnumerable<Error> errors) =>
+        new(errors.SelectMany(error =>
+        {
+            if (error is ValidationError validationError)
+            {
+                return validationError.Errors;
+            }
+
+            return [error];
         }).ToArray());
 }
