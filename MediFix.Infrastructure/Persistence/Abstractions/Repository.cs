@@ -14,7 +14,6 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     {
         List<TEntity> entities = await dbContext
             .Set<TEntity>()
-            .AsNoTracking()
             .ToListAsync(cancellationToken);
 
         if (!entities.Any())
@@ -29,7 +28,6 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     {
         var entity = await dbContext
             .Set<TEntity>()
-            .AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id.Equals(id), cancellationToken);
 
         if (entity is null)
@@ -72,7 +70,6 @@ public abstract class Repository<TEntity, TId>(DbContext dbContext)
     public async Task<Result<TEntity>> GetByIdWithNavigationAsync(TId id, CancellationToken cancellationToken = default)
     {
         var entity = await GetQueryableWithNavigation()
-            .AsNoTracking()
             .SingleOrDefaultAsync(e => e.Id.Equals(id), cancellationToken);
 
         if (entity is null)
