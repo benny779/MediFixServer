@@ -6,7 +6,7 @@ public sealed class Practitioner : AggregateRoot<PractitionerId>
 {
     private readonly HashSet<Expertise> _expertises = [];
 
-    public IReadOnlyList<Expertise> Expertises => _expertises.ToList();
+    public IReadOnlySet<Expertise> Expertises => _expertises;
 
 
     private Practitioner(PractitionerId id) : base(id)

@@ -12,7 +12,7 @@ public class Category(CategoryId id, string name) : Entity<CategoryId>(id)
 
     public string Name { get; set; } = name;
 
-    public IReadOnlyList<Expertise> AllowedExpertises => _allowedExpertises.ToList();
+    public IReadOnlySet<Expertise> AllowedExpertises => _allowedExpertises;
 
 
     public bool AddExpertise(Expertise? expertise)
