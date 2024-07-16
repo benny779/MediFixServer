@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MediFix.Application.ServiceCalls.AssignPractitioner;
+using MediFix.Application.ServiceCalls.CancelServiceCall;
 using MediFix.Application.ServiceCalls.CreateServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCallsWithFilter;
@@ -48,6 +49,16 @@ public class ServiceCallsController(ISender sender) : ApiController
         CancellationToken cancellationToken)
     {
         var command = new AssignPractitionerCommand(id, practitionerId);
+
+        var result = await sender.Send(command, cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+    [HttpPatch("{id:guid}/cancel")]
+    public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new CancelServiceCallCommand(id);
 
         var result = await sender.Send(command, cancellationToken);
 
