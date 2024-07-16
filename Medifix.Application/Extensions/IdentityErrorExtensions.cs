@@ -9,7 +9,7 @@ public static class IdentityErrorExtensions
     {
         var errors = identityErrors
             .Select(e => Error.Validation(e.Code, e.Description) as ValidationError)
-            .SelectMany(e => e.Errors)
+            .SelectMany(e => e!.Errors)
             .ToArray();
 
         return new ValidationError(errors);
