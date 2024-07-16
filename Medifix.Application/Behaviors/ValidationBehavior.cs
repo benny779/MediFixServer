@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using FluentValidation.Results;
 using MediatR;
 using MediFix.Application.Abstractions.Messaging;
 using MediFix.SharedKernel.Results;
@@ -31,7 +32,7 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
             .Where(validationResult => !validationResult.IsValid)
             .SelectMany(validationResult => validationResult.Errors)
             .Select(validationFailure => Error.Validation(
-                $"{typeof(TRequest).Name}.{validationFailure.PropertyName}.{validationFailure.ErrorCode}",
+                GetErrorCode<TRequest>(validationFailure),
                 validationFailure.ErrorMessage))
             .ToList();
 
@@ -43,5 +44,25 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
         var validationError = ValidationError.FromErrors(errors);
 
         return (dynamic)validationError;
+    }
+
+    private static string GetErrorCode<T>(ValidationFailure validationFailure)
+    {
+        string typeName = typeof(T).Name;
+        string propertyName = validationFailure.PropertyName;
+        string errorCode = validationFailure.ErrorCode;
+
+        typeName = typeName
+            .Replace("Command", string.Empty)
+            .Replace("Request", string.Empty);
+
+        errorCode = errorCode.Replace("Validator", string.Empty);
+
+        if (errorCode == propertyName)
+        {
+            errorCode = string.Empty;
+        }
+
+        return $"{typeName}.{propertyName}{(!string.IsNullOrEmpty(errorCode) ? $".{errorCode}" : "")}";
     }
 }
