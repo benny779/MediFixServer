@@ -1,4 +1,6 @@
-﻿namespace MediFix.SharedKernel.Results;
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace MediFix.SharedKernel.Results;
 
 public class Result
 {
@@ -83,18 +85,23 @@ public class Result
 
 public class Result<TValue> : Result
 {
-    public TValue Value { get; }
+    private readonly TValue? _value;
 
     internal Result(bool isSuccess, Error error, TValue value)
         : base(isSuccess, error)
     {
-        Value = value;
+        _value = value;
     }
+
+    [NotNull]
+    public TValue Value => IsSuccess
+        ? _value!
+        : throw new InvalidOperationException("The value of a failure can't be accessed.");
 
     public static implicit operator Result<TValue>(TValue? value) =>
         value is not null ? Success(value) : Failure<TValue>(Error.Unexpected("Value.Null"));
 
-    public static implicit operator TValue?(Result<TValue> result) => result.Value;
+    public static implicit operator TValue(Result<TValue> result) => result.Value;
 
     public static implicit operator Result<TValue>(Error error) => Failure<TValue>(error);
 }
