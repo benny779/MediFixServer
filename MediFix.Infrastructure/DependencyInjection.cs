@@ -1,9 +1,9 @@
-﻿using MediFix.Application.Abstractions.Data;
+﻿using Dapper;
+using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Abstractions.Services;
 using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
 using MediFix.Application.Utils.Persistence;
-using MediFix.Application.Utils.Persistence.Seed;
 using MediFix.Infrastructure.Authentication;
 using MediFix.Infrastructure.Persistence;
 using MediFix.Infrastructure.Persistence.Abstractions;
@@ -47,11 +47,31 @@ public static class DependencyInjection
 
         AddRepositories(services);
 
+        AddStronglyTypedIdMappers();
+
         services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         services.AddScoped<IDbConnectionFactory, DbConnectionFactory>();
 
         return services;
+    }
+
+    private static void AddStronglyTypedIdMappers()
+    {
+        var assembly = typeof(DependencyInjection).Assembly;
+
+        var typeHandlerType = typeof(SqlMapper.TypeHandler<>);
+
+        var handlerTypes = assembly.GetTypes()
+            .Where(t => t.BaseType is { IsGenericType: true } 
+                        && t.BaseType.GetGenericTypeDefinition() == typeHandlerType);
+
+        foreach (var handlerType in handlerTypes)
+        {
+            var handlerInstance = Activator.CreateInstance(handlerType);
+            var handledType = handlerType.BaseType.GetGenericArguments()[0];
+            SqlMapper.AddTypeHandler(handledType, (SqlMapper.ITypeHandler)handlerInstance);
+        }
     }
 
     private static void AddRepositories(IServiceCollection services)
