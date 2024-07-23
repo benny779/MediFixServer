@@ -1,12 +1,9 @@
 ﻿using MediatR;
-using MediFix.Application.Locations.ChangeLocationName;
 using MediFix.Application.Locations.CreateLocation;
-using MediFix.Application.Locations.DeleteLocation;
 using MediFix.Application.Locations.GetLocation;
 using MediFix.Application.Locations.GetLocationChildren;
 using MediFix.Application.Locations.GetLocationsByType;
-using MediFix.Application.Locations.GetLocationTypes;
-using MediFix.Application.Locations.SetActiveStatus;
+using MediFix.Application.Locations.UpdateLocation;
 using MediFix.Domain.Locations;
 using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Authorization;
@@ -14,7 +11,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;
 
-//[Authorize]
+[Authorize]
 public class LocationsController(ISender sender) : ApiController
 {
     //[HttpGet("types")]
@@ -70,36 +67,11 @@ public class LocationsController(ISender sender) : ApiController
             Problem);
     }
 
-    //[HttpPatch("{id:guid}/active/{isActive:bool}")]
-    //public async Task<IActionResult> Activate(Guid id, bool isActive, CancellationToken cancellationToken)
-    //{
-    //    var locationId = LocationId.From(id);
-    //    var command = new SetLocationActiveStatusCommand(locationId, isActive);
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(UpdateLocationCommand request, CancellationToken cancellationToken)
+    {
+        var updateResult = await sender.Send(request, cancellationToken);
 
-    //    var updateResult = await sender.Send(command, cancellationToken);
-
-    //    return updateResult.Match(Ok, Problem);
-    //}
-
-    //[HttpPatch("{id:guid}/name/{newName}")]
-    //public async Task<IActionResult> ChangeName(Guid id, string newName, CancellationToken cancellationToken)
-    //{
-    //    var locationId = LocationId.From(id);
-    //    var query = new ChangeLocationNameCommand(locationId, newName);
-
-    //    var locationsResult = await sender.Send(query, cancellationToken);
-
-    //    return locationsResult.Match(Ok, Problem);
-    //}
-
-    //[HttpDelete("{id:guid}")]
-    //public async Task<IActionResult> Delete(Guid id, CancellationToken cancellationToken)
-    //{
-    //    var locationId = LocationId.From(id);
-    //    var request = new DeleteLocationCommand(locationId);
-
-    //    var deleteResult = await sender.Send(request, cancellationToken);
-
-    //    return deleteResult.Match(NoContent, Problem);
-    //}
+        return updateResult.Match(Ok, Problem);
+    }
 }

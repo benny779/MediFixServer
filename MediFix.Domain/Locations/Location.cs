@@ -72,7 +72,6 @@ public class Location : Entity<LocationId>
             ParentId = parent.Id
         };
     }
-    public void SetActiveStatus(bool isActive) => IsActive = isActive;
 
     private static bool IsValidName(string name)
     {
@@ -84,22 +83,21 @@ public class Location : Entity<LocationId>
             "Location.InvalidName",
             "A location name cannot be null or empty.");
 
-    public Result ChangeName(string name)
+    public Result Update(string? name, bool? isActive)
     {
-        if (!IsValidName(name))
+        if (name is null && isActive is null)
+        {
+            return Result.Success();
+        }
+
+        if (name is not null && !IsValidName(name))
         {
             return ErrorInvalidName;
         }
-        
-        Name = name;
+
+        Name = name ?? Name;
+        IsActive = isActive ?? IsActive;
+
         return Result.Success();
     }
-}
-
-public enum LocationType : byte
-{
-    Building = 1,
-    Floor,
-    Department,
-    Room
 }

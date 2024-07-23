@@ -3,16 +3,18 @@ using MediFix.Application.Abstractions.Messaging;
 using MediFix.Domain.Locations;
 using MediFix.SharedKernel.Results;
 
-namespace MediFix.Application.Locations.ChangeLocationName;
+namespace MediFix.Application.Locations.UpdateLocation;
 
-internal sealed class ChangeLocationNameCommandHandler(
+internal sealed class UpdateLocationCommandHandler(
     ILocationsRepository locationsRepository,
     IUnitOfWork unitOfWork)
-    : ICommandHandler<ChangeLocationNameCommand>
+    : ICommandHandler<UpdateLocationCommand>
 {
-    public async Task<Result> Handle(ChangeLocationNameCommand request, CancellationToken cancellationToken)
+    public async Task<Result> Handle(UpdateLocationCommand request, CancellationToken cancellationToken)
     {
-        var locationResult = await locationsRepository.GetByIdAsync(request.LocationId, cancellationToken);
+        var locationId = LocationId.From(request.LocationId);
+
+        var locationResult = await locationsRepository.GetByIdAsync(locationId, cancellationToken);
 
         if (locationResult.IsFailure)
         {
@@ -21,18 +23,13 @@ internal sealed class ChangeLocationNameCommandHandler(
 
         var location = locationResult.Value;
 
-        if (NamesAreEqual(request, location))
-        {
-            return Result.Success();
-        }
-
         if (await locationsRepository
                 .SameTypeAndNameAlreadyExist(location, cancellationToken))
         {
             return SameTypeAndNameAlreadyExist(location.LocationType, location.Name);
         }
 
-        var changeNameResult = location.ChangeName(request.Name);
+        var changeNameResult = location.Update(request.Name, request.IsActive);
 
         if (changeNameResult.IsFailure)
         {
@@ -44,11 +41,6 @@ internal sealed class ChangeLocationNameCommandHandler(
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return Result.Success();
-    }
-
-    private static bool NamesAreEqual(ChangeLocationNameCommand request, Location location)
-    {
-        return location.Name.Equals(request.Name);
     }
 
     private static Error SameTypeAndNameAlreadyExist(LocationType locationType, string name) =>
