@@ -48,6 +48,11 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
 
     private static string GetErrorCode<T>(ValidationFailure validationFailure)
     {
+        if (IsCustomErrorCode(validationFailure))
+        {
+            return validationFailure.ErrorCode;
+        }
+
         string typeName = typeof(T).Name;
         string propertyName = validationFailure.PropertyName;
         string errorCode = validationFailure.ErrorCode;
@@ -64,5 +69,11 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
         }
 
         return $"{typeName}.{propertyName}{(!string.IsNullOrEmpty(errorCode) ? $".{errorCode}" : "")}";
+    }
+
+    private static bool IsCustomErrorCode(ValidationFailure validationFailure)
+    {
+        return !validationFailure.ErrorCode.EndsWith("Command")
+               && !validationFailure.ErrorCode.EndsWith("Request");
     }
 }
