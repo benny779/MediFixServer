@@ -1,5 +1,7 @@
 ﻿using MediFix.Application.Abstractions.Services;
+using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
+using MediFix.Domain.Users;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -20,14 +22,15 @@ internal sealed class JwtProvider : IJwtProvider
 
     public string GenerateAccessToken(ApplicationUser user)
     {
-        var claims = new Claim[]
-        {
+        IEnumerable<Claim> claims =
+        [
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
             new(JwtRegisteredClaimNames.Email, user.Email!),
             new(JwtRegisteredClaimNames.FamilyName, user.LastName),
             new(JwtRegisteredClaimNames.GivenName, user.FirstName),
-            new(JwtRegisteredClaimNames.Name, user.FullName)
-        };
+            new(JwtRegisteredClaimNames.Name, user.FullName),
+            new("roles", user.Type.ToString())
+        ];
 
         var signingCredentials = new SigningCredentials(
             _jwtOptions.GetSigningKey(),
