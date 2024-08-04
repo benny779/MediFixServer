@@ -146,10 +146,10 @@ internal class PersistenceService(
 
         List<IdentityResult> createResults =
         [
-            createClientResult, 
-            createManagerResult, 
-            createPlumbingResult, 
-            createPlumbing2Result, 
+            createClientResult,
+            createManagerResult,
+            createPlumbingResult,
+            createPlumbing2Result,
             createAirConditioningResult,
             createAirConditioning2Result,
             createElectricityResult,
@@ -185,15 +185,15 @@ internal class PersistenceService(
             .ToList();
 
         var floors = buildings
-            .SelectMany(building => CreateLocations(building, LocationType.Floor, int.Parse(building.Name), 4))
+            .SelectMany(building => CreateLocations(building, LocationType.Floor, ExtractNumbers(building.Name), 4))
             .ToList();
 
         var departments = floors
-            .SelectMany(floor => CreateLocations(floor, LocationType.Department, int.Parse(floor.Name), 4))
+            .SelectMany(floor => CreateLocations(floor, LocationType.Department, ExtractNumbers(floor.Name), 4))
             .ToList();
 
         var rooms = departments
-            .SelectMany(dep => CreateLocations(dep, LocationType.Room, int.Parse(dep.Name) * 2 + 100, 10))
+            .SelectMany(dep => CreateLocations(dep, LocationType.Room, ExtractNumbers(dep.Name) * 2 + 100, 10))
             .ToList();
 
 
@@ -295,5 +295,15 @@ internal class PersistenceService(
             FirstName = "2",
             LastName = "Electricity",
         };
+    }
+
+
+    private static int ExtractNumbers(string str)
+    {
+        var digits = str.Where(char.IsDigit).ToArray();
+        
+        return digits.Length > 0 
+            ? int.Parse(new string(digits))
+            : throw new InvalidOperationException();
     }
 }
