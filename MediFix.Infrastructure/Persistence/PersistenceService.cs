@@ -71,20 +71,29 @@ internal class PersistenceService(
         var applicationUserClient = GetApplicationUserClient();
         var applicationUserManager = GetApplicationUserManager();
         var applicationUserPlumbing = GetApplicationUserPlumbing();
+        var applicationUserPlumbing2 = GetApplicationUserPlumbing2();
         var applicationUserAirConditioning = GetApplicationUserAirConditioning();
+        var applicationUserAirConditioning2 = GetApplicationUserAirConditioning2();
         var applicationUserElectricity = GetApplicationUserElectricity();
+        var applicationUserElectricity2 = GetApplicationUserElectricity2();
 
 
         // Domain users
         var client = Client.Create(ClientId.From(applicationUserClient.Id)).Value;
         var manager = Manager.Create(ManagerId.From(applicationUserManager.Id)).Value;
         var practitionerPlumbing = Practitioner.Create(PractitionerId.From(applicationUserPlumbing.Id)).Value;
+        var practitionerPlumbing2 = Practitioner.Create(PractitionerId.From(applicationUserPlumbing2.Id)).Value;
         var practitionerAirConditioning = Practitioner.Create(PractitionerId.From(applicationUserAirConditioning.Id)).Value;
+        var practitionerAirConditioning2 = Practitioner.Create(PractitionerId.From(applicationUserAirConditioning2.Id)).Value;
         var practitionerElectricity = Practitioner.Create(PractitionerId.From(applicationUserElectricity.Id)).Value;
+        var practitionerElectricity2 = Practitioner.Create(PractitionerId.From(applicationUserElectricity2.Id)).Value;
 
         practitionerPlumbing.AddExpertise(expertisePlumbing);
+        practitionerPlumbing2.AddExpertise(expertisePlumbing);
         practitionerAirConditioning.AddExpertise(expertiseAirConditioning);
+        practitionerAirConditioning2.AddExpertise(expertiseAirConditioning);
         practitionerElectricity.AddExpertise(expertiseElectricity);
+        practitionerElectricity2.AddExpertise(expertiseElectricity);
 
 
         // ServiceCalls
@@ -117,19 +126,34 @@ internal class PersistenceService(
         context.Expertises.AddRange(expertisePlumbing, expertiseAirConditioning, expertiseElectricity);
         context.Clients.Add(client);
         context.Managers.Add(manager);
-        context.Practitioners.AddRange(practitionerPlumbing, practitionerAirConditioning, practitionerElectricity);
+        context.Practitioners.AddRange(
+            practitionerPlumbing,
+            practitionerPlumbing2,
+            practitionerAirConditioning,
+            practitionerAirConditioning2,
+            practitionerElectricity,
+            practitionerElectricity2);
         context.ServiceCalls.AddRange(serviceCallNew, serviceCallFinished, serviceCallCancelled);
 
         var createClientResult = await applicationUserService.CreateAsync(applicationUserClient, DefaultPassword);
         var createManagerResult = await applicationUserService.CreateAsync(applicationUserManager, DefaultPassword);
         var createPlumbingResult = await applicationUserService.CreateAsync(applicationUserPlumbing, DefaultPassword);
+        var createPlumbing2Result = await applicationUserService.CreateAsync(applicationUserPlumbing2, DefaultPassword);
         var createAirConditioningResult = await applicationUserService.CreateAsync(applicationUserAirConditioning, DefaultPassword);
+        var createAirConditioning2Result = await applicationUserService.CreateAsync(applicationUserAirConditioning2, DefaultPassword);
         var createElectricityResult = await applicationUserService.CreateAsync(applicationUserElectricity, DefaultPassword);
+        var createElectricity2Result = await applicationUserService.CreateAsync(applicationUserElectricity2, DefaultPassword);
 
         List<IdentityResult> createResults =
         [
-            createClientResult, createManagerResult, createPlumbingResult, createAirConditioningResult,
-                createElectricityResult
+            createClientResult, 
+            createManagerResult, 
+            createPlumbingResult, 
+            createPlumbing2Result, 
+            createAirConditioningResult,
+            createAirConditioning2Result,
+            createElectricityResult,
+            createElectricity2Result
         ];
 
         if (createResults.Any(result => !result.Succeeded))
@@ -151,7 +175,7 @@ internal class PersistenceService(
     private List<Location> CreateLocations(Location? parent, LocationType type, int first, int count)
     {
         return Enumerable.Range(first, count)
-             .Select(x => Location.Create(LocationId.Create(), type, x.ToString(), parent).Value)
+             .Select(x => Location.Create(LocationId.Create(), type, $"{type} {x}", parent).Value)
              .ToList();
     }
 
@@ -206,9 +230,21 @@ internal class PersistenceService(
         return new ApplicationUser
         {
             Type = UserType.Practitioner,
-            Email = "plumbing@medifix.com",
-            UserName = "plumbing@medifix.com",
-            FirstName = "Practitioner",
+            Email = "plumbing1@medifix.com",
+            UserName = "plumbing1@medifix.com",
+            FirstName = "1",
+            LastName = "Plumbing",
+        };
+    }
+
+    private static ApplicationUser GetApplicationUserPlumbing2()
+    {
+        return new ApplicationUser
+        {
+            Type = UserType.Practitioner,
+            Email = "plumbing2@medifix.com",
+            UserName = "plumbing2@medifix.com",
+            FirstName = "2",
             LastName = "Plumbing",
         };
     }
@@ -218,9 +254,21 @@ internal class PersistenceService(
         return new ApplicationUser
         {
             Type = UserType.Practitioner,
-            Email = "air@medifix.com",
-            UserName = "air@medifix.com",
-            FirstName = "Practitioner",
+            Email = "air1@medifix.com",
+            UserName = "air1@medifix.com",
+            FirstName = "1",
+            LastName = "Air conditioning",
+        };
+    }
+
+    private static ApplicationUser GetApplicationUserAirConditioning2()
+    {
+        return new ApplicationUser
+        {
+            Type = UserType.Practitioner,
+            Email = "air2@medifix.com",
+            UserName = "air2@medifix.com",
+            FirstName = "2",
             LastName = "Air conditioning",
         };
     }
@@ -230,9 +278,21 @@ internal class PersistenceService(
         return new ApplicationUser
         {
             Type = UserType.Practitioner,
-            Email = "electricity@medifix.com",
-            UserName = "electricity@medifix.com",
-            FirstName = "Practitioner",
+            Email = "electricity1@medifix.com",
+            UserName = "electricity1@medifix.com",
+            FirstName = "1",
+            LastName = "Electricity",
+        };
+    }
+
+    private static ApplicationUser GetApplicationUserElectricity2()
+    {
+        return new ApplicationUser
+        {
+            Type = UserType.Practitioner,
+            Email = "electricity2@medifix.com",
+            UserName = "electricity2@medifix.com",
+            FirstName = "2",
             LastName = "Electricity",
         };
     }
