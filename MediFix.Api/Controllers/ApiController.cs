@@ -51,5 +51,20 @@ public abstract class ApiController : ControllerBase
 
         return base.CreatedAtAction(actionName, value);
     }
+
+    protected bool IsIdsMismatch(Guid id1, Guid id2, out IActionResult? problem)
+    {
+        if (id1 != id2)
+        {
+            problem = Problem(Error.Validation(
+                "Mismatch.Id",
+                $"A mismatch between the IDs ('{id1}' and '{id2}')."));
+
+            return true;
+        }
+
+        problem = null;
+        return false;
+    }
 }
 
