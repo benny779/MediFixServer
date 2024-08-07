@@ -30,6 +30,13 @@ public record Error
         string code = "General.Conflict",
         string description = "A conflict error has occurred.")
             => new(code, description, ErrorType.Conflict);
+
+    public static Error AlreadyExists<TEntity>(string propertyName)
+        => new(
+            $"{typeof(TEntity).Name}.AlreadyExists",
+            $"An entity {typeof(TEntity).Name} with the given {propertyName} already exists.",
+            ErrorType.NotFound);
+
     public static Error NotFound(
         string code = "General.NotFound",
         string description = "A 'Not Found' error has occurred.")
