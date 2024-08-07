@@ -35,7 +35,10 @@ public class LocationsController(ISender sender) : ApiController
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetById(
+        Guid id,
+        [FromQuery] bool includeParents,
+        CancellationToken cancellationToken)
     {
         var locationId = LocationId.From(id);
         var query = new GetLocationRequest(locationId);
@@ -68,8 +71,13 @@ public class LocationsController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(UpdateLocationCommand request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid id,  UpdateLocationCommand request, CancellationToken cancellationToken)
     {
+        if (IsIdsMismatch(id, request.LocationId, out var problem))
+        {
+            return problem!;
+        }
+
         var updateResult = await sender.Send(request, cancellationToken);
 
         return updateResult.Match(Ok, Problem);
