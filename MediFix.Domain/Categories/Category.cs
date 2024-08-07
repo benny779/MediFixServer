@@ -3,7 +3,7 @@ using MediFix.Domain.Users;
 
 namespace MediFix.Domain.Categories;
 
-public class Category(CategoryId id, string name) : Entity<CategoryId>(id)
+public class Category(CategoryId id, string name, bool isActive = true) : Entity<CategoryId>(id)
 {
     public const int NameMaxLength = 30;
 
@@ -11,6 +11,7 @@ public class Category(CategoryId id, string name) : Entity<CategoryId>(id)
 
 
     public string Name { get; set; } = name;
+    public bool IsActive { get; set; } = isActive;
 
     public IReadOnlySet<Expertise> AllowedExpertises => _allowedExpertises;
 
@@ -18,6 +19,11 @@ public class Category(CategoryId id, string name) : Entity<CategoryId>(id)
     public bool AddExpertise(Expertise? expertise)
     {
         return expertise is not null && _allowedExpertises.Add(expertise);
+    }
+
+    public bool DeleteExpertise(Expertise? expertise)
+    {
+        return expertise is not null && _allowedExpertises.Remove(expertise);
     }
 
     public bool IsPractitionerAllowed(Practitioner practitioner)

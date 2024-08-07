@@ -8,8 +8,8 @@ public record CategoriesResponse(
     public static CategoriesResponse FromDomainCategories(IEnumerable<Category> categories)
     {
         return new CategoriesResponse(
-            categories.Select(
-                    category => new CategoryResponse(category.Id, category.Name))
+            categories
+                .Select(CategoryResponse.FromDomainCategory)
                 .ToList());
     }
 }

@@ -25,5 +25,8 @@ internal class CategoryConfiguration : IEntityTypeConfiguration<Category>
             .WithMany(e => e.Categories)
             .UsingEntity(join =>
                 join.ToTable($"{nameof(Category)}{nameof(Expertise)}"));
+
+        builder.Navigation(c => c.AllowedExpertises)
+            .AutoInclude();
     }
 }
