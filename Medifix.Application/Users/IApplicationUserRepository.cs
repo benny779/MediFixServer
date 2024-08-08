@@ -1,8 +1,6 @@
-﻿using MediFix.Application.Users.Entities;
+﻿using MediFix.Application.Abstractions.Data;
+using MediFix.Application.Users.Entities;
 
 namespace MediFix.Application.Users;
 
-public interface IApplicationUserRepository
-{
-    void Update(ApplicationUser user);
-}
+public interface IApplicationUserRepository : IRepository<ApplicationUser>;
