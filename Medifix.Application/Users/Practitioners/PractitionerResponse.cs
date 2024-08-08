@@ -7,4 +7,6 @@ public record PractitionerResponse(
     string FirstName,
     string LastName,
     string FullName,
+    string Email,
+    string? PhoneNumber,
     IEnumerable<ExpertiseResponse> Expertises);

@@ -35,6 +35,8 @@ public class PractitionerRepository(ApplicationDbContext dbContext)
                     appUser.FirstName,
                     appUser.LastName,
                     appUser.FullName,
+                    appUser.Email!,
+                    appUser.PhoneNumber,
                     practitioner.Expertises.Select(exp => new ExpertiseResponse(exp.Id, exp.Name)))
             );
     }
