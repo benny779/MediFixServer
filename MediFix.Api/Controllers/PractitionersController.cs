@@ -4,6 +4,7 @@ using MediFix.Application.Users.Practitioners.DeletePractitionerExpertise;
 using MediFix.Application.Users.Practitioners.GetPractitionerById;
 using MediFix.Application.Users.Practitioners.GetPractitioners;
 using MediFix.Application.Users.Practitioners.GetPractitionersBySubOrCategory;
+using MediFix.Application.Users.UpdateUser;
 using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Mvc;
 
@@ -43,6 +44,22 @@ public class PractitionersController(ISender sender) : ApiController
 
             return result.Match(Ok, Problem);
         }
+    }
+
+    [HttpPut("{id:guid}")]
+    public async Task<IActionResult> Update(
+        Guid id, 
+        UpdateUserCommand command,
+        CancellationToken cancellationToken)
+    {
+        if (IsIdsMismatch(id, command.Id, out var problem))
+        {
+            return problem!;
+        }
+
+        var result = await sender.Send(command, cancellationToken);
+
+        return result.Match(NoContent, Problem);
     }
 
     [HttpPost("{id:guid}/expertises")]
