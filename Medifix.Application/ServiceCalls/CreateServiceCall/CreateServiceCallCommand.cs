@@ -9,4 +9,4 @@ public record CreateServiceCallCommand(
     ServiceCallType ServiceCallType,
     Guid SubCategoryId,
     string Details,
-    ServiceCallPriority Priority = ServiceCallPriority.Low) : ICommand<CreateServiceCallResponse>;
+    ServiceCallPriority Priority = ServiceCallPriority.Low) : ICreateCommand<CreateServiceCallResponse>;

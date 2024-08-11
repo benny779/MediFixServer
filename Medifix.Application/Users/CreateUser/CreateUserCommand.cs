@@ -11,7 +11,7 @@ public record CreateUserCommand(
     string Email,
     string Password,
     string ConfirmPassword,
-    string? PhoneNumber = null) : ICommand<CreateUserResponse>
+    string? PhoneNumber = null) : ICreateCommand<CreateUserResponse>
 {
     public ApplicationUser ToApplicationUser()
     {

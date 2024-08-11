@@ -4,4 +4,4 @@ namespace MediFix.Application.Categories.CreateCategory;
 
 public record CreateCategoryCommand(
     string Name,
-    bool IsActive) : ICommand<CategoryResponse>;
+    bool IsActive) : ICreateCommand<CategoryResponse>;

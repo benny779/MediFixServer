@@ -1,4 +1,5 @@
-﻿using MediFix.Domain.Locations;
+﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.Domain.Locations;
 
 namespace MediFix.Application.Locations.CreateLocation;
 
@@ -7,4 +8,4 @@ public record CreateLocationResponse(
     LocationType LocationType,
     string Name,
     bool IsActive,
-    Guid? ParentLocationId);
+    Guid? ParentLocationId) : ICreatedResponse;

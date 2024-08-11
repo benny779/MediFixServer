@@ -1,3 +1,5 @@
-﻿namespace MediFix.Application.Users.CreateUser;
+﻿using MediFix.Application.Abstractions.Messaging;
 
-public record CreateUserResponse(Guid Id);
+namespace MediFix.Application.Users.CreateUser;
+
+public record CreateUserResponse(Guid Id) : ICreatedResponse;

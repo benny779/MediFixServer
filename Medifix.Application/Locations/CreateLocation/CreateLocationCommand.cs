@@ -6,4 +6,4 @@ namespace MediFix.Application.Locations.CreateLocation;
 public record CreateLocationCommand(
     LocationType LocationType,
     string Name,
-    Guid? ParentLocationId) : ICommand<CreateLocationResponse>;
+    Guid? ParentLocationId) : ICreateCommand<CreateLocationResponse>;
