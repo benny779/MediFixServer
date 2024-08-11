@@ -1,7 +1,8 @@
-﻿using MediFix.Domain.Locations;
+﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.Domain.Locations;
 
 namespace MediFix.Application.Locations.GetLocationChildren;
 
 public record GetLocationChildrenResponse(
     LocationType ChildrenLocationType,
-    List<LocationResponse> Values);
+    IEnumerable<LocationResponse> Items) : IListResponse<LocationResponse>;

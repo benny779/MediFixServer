@@ -1,3 +1,5 @@
-﻿namespace MediFix.Application.Users.Practitioners;
+﻿using MediFix.Application.Abstractions.Messaging;
 
-public record PractitionersResponse(IEnumerable<PractitionerResponse> Practitioners);
+namespace MediFix.Application.Users.Practitioners;
+
+public record PractitionersResponse(IEnumerable<PractitionerResponse> Items) : IListResponse<PractitionerResponse>;

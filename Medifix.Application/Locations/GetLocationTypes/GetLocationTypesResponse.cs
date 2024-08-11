@@ -1,6 +1,6 @@
-﻿using MediFix.Domain.Locations;
+﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.Domain.Locations;
 
 namespace MediFix.Application.Locations.GetLocationTypes;
 
-public record GetLocationTypesResponse(
-    List<LocationType> LocationTypes);
+public record GetLocationTypesResponse(IEnumerable<LocationType> Items) : IListResponse<LocationType>;

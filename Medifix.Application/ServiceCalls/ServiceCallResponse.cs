@@ -1,10 +1,11 @@
-﻿using MediFix.Domain.Locations;
+﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
 
 namespace MediFix.Application.ServiceCalls;
 
 public record ServiceCallsResponse(
-    IEnumerable<ServiceCallResponse> ServiceCalls);
+    IEnumerable<ServiceCallResponse> Items) : IListResponse<ServiceCallResponse>;
 
 public record ServiceCallResponse(
     Guid Id,

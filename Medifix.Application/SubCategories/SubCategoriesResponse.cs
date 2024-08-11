@@ -1,9 +1,9 @@
-﻿using MediFix.Domain.Categories;
+﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.Domain.Categories;
 
 namespace MediFix.Application.SubCategories;
 
-public record SubCategoriesResponse(
-    IEnumerable<SubCategoryResponse> SubCategories)
+public record SubCategoriesResponse(IEnumerable<SubCategoryResponse> Items) : IListResponse<SubCategoryResponse>
 {
     public static SubCategoriesResponse FromDomainCategories(IEnumerable<SubCategory> subCategories)
     {

@@ -1,4 +1,5 @@
-﻿namespace MediFix.Application.Expertises;
+﻿using MediFix.Application.Abstractions.Messaging;
 
-public record ExpertisesResponse(
-    IEnumerable<ExpertiseResponse> Expertises);
+namespace MediFix.Application.Expertises;
+
+public record ExpertisesResponse(IEnumerable<ExpertiseResponse> Items) : IListResponse<ExpertiseResponse>;
