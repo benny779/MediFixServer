@@ -48,6 +48,11 @@ public sealed class ValidationBehavior<TRequest, TResponse>(
 
     private static string GetErrorCode<T>(ValidationFailure validationFailure)
     {
+        if (validationFailure.ErrorCode is null)
+        {
+            return string.Empty;
+        }
+
         if (IsCustomErrorCode(validationFailure))
         {
             return validationFailure.ErrorCode;
