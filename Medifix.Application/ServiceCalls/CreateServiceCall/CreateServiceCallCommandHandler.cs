@@ -21,13 +21,6 @@ internal sealed class CreateServiceCallCommandHandler(
 {
     public async Task<Result<CreateServiceCallResponse>> Handle(CreateServiceCallCommand request, CancellationToken cancellationToken)
     {
-        var validationResult = await ValidateRequest(request, cancellationToken);
-
-        if (validationResult.Any())
-        {
-            return ValidationError.FromResults(validationResult);
-        }
-
         var serviceCallResult = ServiceCall.Create(
             ClientId.From(request.ClientId),
             LocationId.From(request.LocationId),
@@ -48,22 +41,5 @@ internal sealed class CreateServiceCallCommandHandler(
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
         return new CreateServiceCallResponse(serviceCall.Id);
-    }
-
-    private async Task<List<Result>> ValidateRequest(CreateServiceCallCommand request, CancellationToken cancellationToken)
-    {
-        var errors = new List<Result>
-        {
-            await clientRepository.GetByIdAsync(ClientId.From(request.ClientId), cancellationToken),
-            await locationsRepository.GetByIdAsync(LocationId.From(request.LocationId), cancellationToken),
-            await subCategoryRepository.GetByIdAsync(SubCategoryId.From(request.SubCategoryId), cancellationToken)
-        };
-
-        if (string.IsNullOrWhiteSpace(request.Details))
-        {
-            errors.Add(Error.ValueIsNullOrWhiteSpace(request.Details));
-        }
-
-        return errors.FindAll(r => r.IsFailure);
     }
 }
