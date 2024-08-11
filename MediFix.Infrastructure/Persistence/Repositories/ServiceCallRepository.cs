@@ -61,6 +61,7 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                         subcat.Name),
                     sc.Details,
                     sc.DateCreated,
+                    sc.Priority,
                     sc.StatusHistory.ToList(),
                     sc.CurrentStatus,
                     pracAppUser != null

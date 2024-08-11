@@ -15,6 +15,7 @@ public record ServiceCallResponse(
     ServiceCallSubCategory SubCategory,
     string Details,
     DateTime DateCreated,
+    ServiceCallPriority Priority,
     IList<ServiceCallStatusUpdate> StatusUpdates,
     ServiceCallStatusUpdate CurrentStatus,
     ServiceCallPractitioner? Practitioner
