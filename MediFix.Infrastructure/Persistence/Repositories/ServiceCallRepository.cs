@@ -34,7 +34,8 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                     sc.Id,
                     new ServiceCallClient(
                         client.Id,
-                        clientAppUser.FullName),
+                        clientAppUser.FullName,
+                        clientAppUser.PhoneNumber),
                     new ServiceCallLocations(
                         new ServiceCallLocation(
                             building.Id,
@@ -67,7 +68,8 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                     pracAppUser != null
                         ? new ServiceCallPractitioner(
                             pracAppUser.Id,
-                            pracAppUser.FullName)
+                            pracAppUser.FullName,
+                            pracAppUser.PhoneNumber)
                         : null);
     }
 

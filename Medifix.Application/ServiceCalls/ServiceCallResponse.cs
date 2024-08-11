@@ -44,8 +44,10 @@ public record ServiceCallCategory(
 
 public record ServiceCallClient(
     Guid Id,
-    string FullName);
+    string FullName,
+    string? PhoneNumber);
 
 public record ServiceCallPractitioner(
     Guid Id,
-    string FullName);
+    string FullName,
+    string? PhoneNumber);
