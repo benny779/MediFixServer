@@ -3,6 +3,7 @@ using MediFix.Application.Locations.CreateLocation;
 using MediFix.Application.Locations.GetLocation;
 using MediFix.Application.Locations.GetLocationChildren;
 using MediFix.Application.Locations.GetLocationsByType;
+using MediFix.Application.Locations.GetLocationWithParents;
 using MediFix.Application.Locations.UpdateLocation;
 using MediFix.Domain.Locations;
 using MediFix.SharedKernel.Results;
@@ -37,15 +38,26 @@ public class LocationsController(ISender sender) : ApiController
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetById(
         Guid id,
-        [FromQuery] bool includeParents,
+        [FromQuery] bool withParents,
         CancellationToken cancellationToken)
     {
-        var locationId = LocationId.From(id);
-        var query = new GetLocationRequest(locationId);
+        if (!withParents)
+        {
+            var locationId = LocationId.From(id);
+            var query = new GetLocationRequest(locationId);
 
-        var locationResult = await sender.Send(query, cancellationToken);
+            var locationResult = await sender.Send(query, cancellationToken);
 
-        return locationResult.Match(Ok, Problem);
+            return locationResult.Match(Ok, Problem);
+        }
+        else
+        {
+            var query = new GetLocationWithParentsRequest(id);
+
+            var locationResult = await sender.Send(query, cancellationToken);
+
+            return locationResult.Match(Ok, Problem);
+        }
     }
 
     [HttpGet("{id:guid}/children")]
@@ -71,7 +83,7 @@ public class LocationsController(ISender sender) : ApiController
     }
 
     [HttpPut("{id:guid}")]
-    public async Task<IActionResult> Update(Guid id,  UpdateLocationCommand request, CancellationToken cancellationToken)
+    public async Task<IActionResult> Update(Guid id, UpdateLocationCommand request, CancellationToken cancellationToken)
     {
         if (IsIdsMismatch(id, request.LocationId, out var problem))
         {
