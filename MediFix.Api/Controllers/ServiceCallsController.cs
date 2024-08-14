@@ -1,9 +1,11 @@
 ﻿using MediatR;
 using MediFix.Application.ServiceCalls.AssignPractitioner;
 using MediFix.Application.ServiceCalls.CancelServiceCall;
+using MediFix.Application.ServiceCalls.CloseServiceCallCommand;
 using MediFix.Application.ServiceCalls.CreateServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCallsWithFilter;
+using MediFix.Application.ServiceCalls.StartServiceCall;
 using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,7 +19,7 @@ public class ServiceCallsController(ISender sender) : ApiController
     public async Task<IActionResult> GetById(Guid id, CancellationToken cancellationToken)
     {
         var request = new GetServiceCallRequest(id);
-        
+
         var result = await sender.Send(request, cancellationToken);
 
         return result.Match(Ok, Problem);
@@ -59,6 +61,33 @@ public class ServiceCallsController(ISender sender) : ApiController
     public async Task<IActionResult> Cancel(Guid id, CancellationToken cancellationToken)
     {
         var command = new CancelServiceCallCommand(id);
+
+        var result = await sender.Send(command, cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+    [HttpPatch("{id:guid}/start")]
+    public async Task<IActionResult> Start(Guid id, CancellationToken cancellationToken)
+    {
+        var command = new StartServiceCallCommand(id);
+
+        var result = await sender.Send(command, cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+
+    [HttpPatch("{id:guid}/close")]
+    public async Task<IActionResult> Close(
+        Guid id,
+        CloseServiceCallCommand command,
+        CancellationToken cancellationToken)
+    {
+        if (IsIdsMismatch(id, command.ServiceCallId, out var problem))
+        {
+            return problem!;
+        }
 
         var result = await sender.Send(command, cancellationToken);
 
