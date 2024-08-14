@@ -65,6 +65,7 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                     sc.Priority,
                     sc.StatusHistory.ToList(),
                     sc.CurrentStatus,
+                    sc.CloseDetails,
                     pracAppUser != null
                         ? new ServiceCallPractitioner(
                             pracAppUser.Id,

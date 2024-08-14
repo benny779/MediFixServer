@@ -110,7 +110,7 @@ internal class PersistenceService(
         var serviceCallFinished = ServiceCall.Create(client.Id, rooms[1].Id, ServiceCallType.Repair, bulb.Id, "It's dark here").Value;
         serviceCallFinished.AssignPractitioner(manager.Id, practitionerElectricity.Id);
         serviceCallFinished.Start(practitionerElectricity.Id);
-        serviceCallFinished.Finish(practitionerElectricity.Id);
+        serviceCallFinished.Finish(practitionerElectricity.Id, "replace the bulb.");
 
         var serviceCallCancelled = ServiceCall.Create(client.Id, rooms[2].Id, ServiceCallType.New, sockets.Id, "The sockets don't work - no electricity", ServiceCallPriority.High).Value;
         serviceCallCancelled.Cancel(client.Id);

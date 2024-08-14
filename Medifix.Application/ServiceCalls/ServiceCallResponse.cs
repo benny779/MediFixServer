@@ -19,6 +19,7 @@ public record ServiceCallResponse(
     ServiceCallPriority Priority,
     IList<ServiceCallStatusUpdate> StatusUpdates,
     ServiceCallStatusUpdate CurrentStatus,
+    string? CloseDetails,
     ServiceCallPractitioner? Practitioner
     );
 

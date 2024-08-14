@@ -26,6 +26,8 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
 
     public ServiceCallStatus Status { get; private set; }
 
+    public string? CloseDetails { get; private set; }
+
     public PractitionerId? PractitionerId { get; private set; }
 
     public ServiceCallStatusUpdate CurrentStatus => _statusHistory.MaxBy(s => s.DateTime)!;
@@ -161,7 +163,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         return Result.Success();
     }
 
-    public Result Finish(Guid updateUserId)
+    public Result Finish(Guid updateUserId, string closeDetails)
     {
         if (Status != ServiceCallStatus.Started)
         {
@@ -169,6 +171,7 @@ public class ServiceCall : AggregateRoot<ServiceCallId>
         }
 
         SetStatus(ServiceCallStatus.Finished, updateUserId);
+        CloseDetails = closeDetails;
 
         // TODO: service call finished event
 
