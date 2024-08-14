@@ -25,6 +25,7 @@ public static class DependencyInjection
 
         services.AddScoped<IApplicationUserService, ApplicationUserService>();
         services.AddSingleton<IJwtProvider, JwtProvider>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
 
         services.AddScoped<IPersistenceService, PersistenceService>();
 

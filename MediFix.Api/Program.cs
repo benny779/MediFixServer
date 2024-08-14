@@ -9,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddCustomConfigureOptions();
 
+builder.Services.AddHttpContextAccessor();
+
 builder.Services
     .AddApplication()
     .AddInfrastructure(builder.Configuration);
