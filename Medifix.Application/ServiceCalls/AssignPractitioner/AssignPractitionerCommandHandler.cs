@@ -1,5 +1,6 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Abstractions.Messaging;
+using MediFix.Application.Abstractions.Services;
 using MediFix.Application.SubCategories;
 using MediFix.Application.Users;
 using MediFix.Domain.ServiceCalls;
@@ -12,7 +13,8 @@ internal sealed class AssignPractitionerCommandHandler(
     IServiceCallRepository serviceCallRepository,
     IPractitionerRepository practitionerRepository,
     ISubCategoryRepository subCategoryRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    ICurrentUser currentUser)
     : ICommandHandler<AssignPractitionerCommand>
 {
     public async Task<Result> Handle(AssignPractitionerCommand request, CancellationToken cancellationToken)
@@ -60,11 +62,7 @@ internal sealed class AssignPractitionerCommandHandler(
                 "This practitioner is not allowed to be assigned to this service call.");
         }
 
-
-        // TODO: Get current user
-        var currentUserId = Guid.NewGuid();
-
-        var assignResult = serviceCall.AssignPractitioner(currentUserId, practitionerId);
+        var assignResult = serviceCall.AssignPractitioner(currentUser.Id, practitionerId);
 
         if (assignResult.IsFailure)
         {

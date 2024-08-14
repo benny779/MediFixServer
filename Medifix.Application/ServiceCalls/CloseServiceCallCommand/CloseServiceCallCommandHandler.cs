@@ -1,5 +1,6 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Abstractions.Messaging;
+using MediFix.Application.Abstractions.Services;
 using MediFix.Domain.ServiceCalls;
 using MediFix.SharedKernel.Results;
 
@@ -7,7 +8,8 @@ namespace MediFix.Application.ServiceCalls.CloseServiceCallCommand;
 
 internal sealed class CloseServiceCallCommandHandler(
     IServiceCallRepository serviceCallRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    ICurrentUser currentUser)
     : ICommandHandler<CloseServiceCallCommand>
 {
     public async Task<Result> Handle(CloseServiceCallCommand request, CancellationToken cancellationToken)
@@ -23,9 +25,7 @@ internal sealed class CloseServiceCallCommandHandler(
 
         var serviceCall = serviceCallResult.Value;
 
-        // TODO: Get current user
-        var currentUserId = Guid.NewGuid();
-        var startResult = serviceCall.Finish(currentUserId, request.CloseDetails);
+        var startResult = serviceCall.Finish(currentUser.Id, request.CloseDetails);
 
         if (startResult.IsFailure)
         {

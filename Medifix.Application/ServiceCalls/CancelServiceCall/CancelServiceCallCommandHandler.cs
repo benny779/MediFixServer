@@ -1,5 +1,6 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Abstractions.Messaging;
+using MediFix.Application.Abstractions.Services;
 using MediFix.Domain.ServiceCalls;
 using MediFix.SharedKernel.Results;
 
@@ -7,7 +8,8 @@ namespace MediFix.Application.ServiceCalls.CancelServiceCall;
 
 internal sealed class CancelServiceCallCommandHandler(
     IServiceCallRepository serviceCallRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    ICurrentUser currentUser)
     : ICommandHandler<CancelServiceCallCommand>
 {
     public async Task<Result> Handle(CancelServiceCallCommand request, CancellationToken cancellationToken)
@@ -24,10 +26,7 @@ internal sealed class CancelServiceCallCommandHandler(
 
         var serviceCall = serviceCallResult.Value;
 
-        // TODO: Get current user
-        var updateUserId = Guid.NewGuid();
-        
-        var cancelResult = serviceCall.Cancel(updateUserId);
+        var cancelResult = serviceCall.Cancel(currentUser.Id);
 
         if (cancelResult.IsFailure)
         {
