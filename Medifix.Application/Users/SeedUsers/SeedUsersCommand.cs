@@ -11,7 +11,6 @@ public record SeedUsersCommand : ICommand;
 
 internal sealed class SeedUsersCommandHandler(
     IUnitOfWork unitOfWork,
-    IApplicationUserService applicationUserService,
     ISender sender)
     : ICommandHandler<SeedUsersCommand>
 {

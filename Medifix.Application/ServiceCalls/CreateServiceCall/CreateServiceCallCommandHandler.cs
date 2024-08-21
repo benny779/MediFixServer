@@ -1,8 +1,5 @@
 ﻿using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Abstractions.Messaging;
-using MediFix.Application.Locations;
-using MediFix.Application.SubCategories;
-using MediFix.Application.Users;
 using MediFix.Domain.Categories;
 using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
@@ -12,9 +9,6 @@ using MediFix.SharedKernel.Results;
 namespace MediFix.Application.ServiceCalls.CreateServiceCall;
 
 internal sealed class CreateServiceCallCommandHandler(
-    IClientRepository clientRepository,
-    ILocationsRepository locationsRepository,
-    ISubCategoryRepository subCategoryRepository,
     IServiceCallRepository serviceCallRepository,
     IUnitOfWork unitOfWork)
     : ICommandHandler<CreateServiceCallCommand, CreateServiceCallResponse>

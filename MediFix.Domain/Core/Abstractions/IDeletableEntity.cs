@@ -1,6 +1,4 @@
-﻿using MediFix.Domain.Users;
-
-namespace MediFix.Domain.Core.Abstractions;
+﻿namespace MediFix.Domain.Core.Abstractions;
 
 public interface IDeletableEntity
 {

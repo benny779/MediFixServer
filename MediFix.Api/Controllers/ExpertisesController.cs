@@ -1,7 +1,4 @@
 ﻿using MediatR;
-using MediFix.Application.Categories.AddCategoryExpertise;
-using MediFix.Application.Categories.DeleteCategoryExpertise;
-using MediFix.Application.Categories.UpdateCategory;
 using MediFix.Application.Expertises.CreateExpertise;
 using MediFix.Application.Expertises.GetExpertise;
 using MediFix.Application.Expertises.GetExpertises;
