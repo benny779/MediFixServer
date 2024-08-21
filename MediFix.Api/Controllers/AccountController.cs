@@ -2,9 +2,7 @@
 using MediFix.Application.Users.CreateUser;
 using MediFix.Application.Users.Login;
 using MediFix.Application.Users.RefreshToken;
-using MediFix.Application.Users.SeedUsers;
 using MediFix.SharedKernel.Results;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;

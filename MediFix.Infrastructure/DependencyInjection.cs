@@ -1,5 +1,6 @@
 ﻿using Dapper;
 using MediFix.Application.Abstractions.Data;
+using MediFix.Application.Abstractions.Email;
 using MediFix.Application.Abstractions.Services;
 using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
@@ -8,6 +9,7 @@ using MediFix.Infrastructure.Authentication;
 using MediFix.Infrastructure.Persistence;
 using MediFix.Infrastructure.Persistence.Abstractions;
 using MediFix.Infrastructure.Services;
+using MediFix.Infrastructure.Services.Email;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -29,6 +31,8 @@ public static class DependencyInjection
 
         services.AddScoped<IPersistenceService, PersistenceService>();
 
+        services.AddEmailService(configuration);
+
         return services;
     }
 
@@ -37,11 +41,11 @@ public static class DependencyInjection
         IConfiguration configuration)
     {
         services.AddIdentityCore<ApplicationUser>(options =>
-        {
-            options.User.RequireUniqueEmail = true;
-        })
-        .AddEntityFrameworkStores<ApplicationDbContext>()
-        .AddSignInManager<SignInManager<ApplicationUser>>();
+            {
+                options.User.RequireUniqueEmail = true;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddSignInManager<SignInManager<ApplicationUser>>();
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("MediFix")));
@@ -64,7 +68,7 @@ public static class DependencyInjection
         var typeHandlerType = typeof(SqlMapper.TypeHandler<>);
 
         var handlerTypes = assembly.GetTypes()
-            .Where(t => t.BaseType is { IsGenericType: true } 
+            .Where(t => t.BaseType is { IsGenericType: true }
                         && t.BaseType.GetGenericTypeDefinition() == typeHandlerType);
 
         foreach (var handlerType in handlerTypes)
@@ -94,7 +98,7 @@ public static class DependencyInjection
                 repoInterface,
                 repositoryTypes
                     .FirstOrDefault(repoType => repoType.Name.Equals(repoInterface.Name[1..])
-                        && repoType.GetInterfaces().Contains(repoInterface))))
+                                                && repoType.GetInterfaces().Contains(repoInterface))))
             .Where(pair => pair.Value is not null)
             .ToList();
 
@@ -102,5 +106,35 @@ public static class DependencyInjection
         {
             services.AddScoped(repo.Key, repo.Value!);
         }
+    }
+
+    private static IServiceCollection AddEmailService(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var emailOptions = configuration
+            .GetRequiredSection(EmailOptions.SectionName)
+            .Get<EmailOptions>()!;
+
+        var fluentEmail = services.AddFluentEmail(
+            emailOptions.SenderEmail,
+            emailOptions.SenderName);
+
+        if (emailOptions.UseAuth)
+        {
+            fluentEmail.AddSmtpSender(
+                emailOptions.SmtpServer,
+                emailOptions.SmtpPort,
+                emailOptions.Username,
+                emailOptions.Password);
+        }
+        else
+        {
+            fluentEmail.AddSmtpSender(emailOptions.SmtpServer, emailOptions.SmtpPort);
+        }
+
+        services.AddTransient<IEmailService, EmailService>();
+
+        return services;
     }
 }
