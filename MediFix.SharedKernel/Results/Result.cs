@@ -31,7 +31,7 @@ public class Result
         }
         catch (Exception ex)
         {
-            return Failure(Error.Failure(code: "General.Exception", description: ex.Message));
+            return Failure(Error.FromException(ex));
         }
     }
 
@@ -43,7 +43,7 @@ public class Result
         }
         catch (Exception ex)
         {
-            return Failure<TResult>(Error.Failure(code: "General.Exception", description: ex.Message));
+            return Failure<TResult>(Error.FromException(ex));
         }
     }
 
@@ -56,7 +56,7 @@ public class Result
         }
         catch (Exception ex)
         {
-            return Failure(Error.Failure(code: "General.Exception", description: ex.Message));
+            return Failure(Error.FromException(ex));
         }
     }
 
@@ -68,7 +68,7 @@ public class Result
         }
         catch (Exception ex)
         {
-            return Failure<TResult>(Error.Failure(code: "General.Exception", description: ex.Message));
+            return Failure<TResult>(Error.FromException(ex));
         }
     }
 

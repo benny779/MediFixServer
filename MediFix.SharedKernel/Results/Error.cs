@@ -86,6 +86,15 @@ public record Error
         string description = "A 'Forbidden' error has occurred.")
            => new(code, description, ErrorType.Forbidden);
 
+    public static Error FromException(Exception exception)
+    {
+        var errorDescription = exception.InnerException is not null
+            ? $"{exception.Message} | Inner Exception: {exception.InnerException.Message}"
+            : exception.Message;
+
+        return Failure(code: exception.GetType().Name, description: errorDescription);
+    }
+
 
     protected Error(string code, string? description, ErrorType type)
     {
