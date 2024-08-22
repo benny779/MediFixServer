@@ -1,5 +1,7 @@
 ﻿using MediFix.Application.Abstractions.Data;
+using MediFix.Application.Abstractions.Email;
 using MediFix.Application.Abstractions.Messaging;
+using MediFix.Application.Abstractions.Services;
 using MediFix.Domain.Categories;
 using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
@@ -10,7 +12,9 @@ namespace MediFix.Application.ServiceCalls.CreateServiceCall;
 
 internal sealed class CreateServiceCallCommandHandler(
     IServiceCallRepository serviceCallRepository,
-    IUnitOfWork unitOfWork)
+    IUnitOfWork unitOfWork,
+    ICurrentUser currentUser,
+    IEmailService emailService)
     : ICommandHandler<CreateServiceCallCommand, CreateServiceCallResponse>
 {
     public async Task<Result<CreateServiceCallResponse>> Handle(CreateServiceCallCommand request, CancellationToken cancellationToken)
@@ -32,7 +36,22 @@ internal sealed class CreateServiceCallCommandHandler(
 
         serviceCallRepository.Insert(serviceCall);
 
+        var transaction = await unitOfWork.BeginTransactionAsync();
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
+        var mailResult = await emailService.SendEmailAsync(
+            currentUser.Email,
+            "Your service call was created successfully",
+            string.Empty,
+            cancellationToken);
+
+        if (mailResult.IsFailure)
+        {
+            return mailResult.Error;
+        }
+
+        transaction.Commit();
 
         return new CreateServiceCallResponse(serviceCall.Id);
     }
