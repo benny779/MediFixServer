@@ -3,6 +3,7 @@ using MediFix.Application.Abstractions.Messaging;
 using MediFix.Application.Abstractions.Services;
 using MediFix.Domain.ServiceCalls;
 using MediFix.SharedKernel.Results;
+using System.Net.Quic;
 
 namespace MediFix.Application.ServiceCalls.CloseServiceCallCommand;
 
@@ -24,12 +25,20 @@ internal sealed class CloseServiceCallCommandHandler(
         }
 
         var serviceCall = serviceCallResult.Value;
-
-        var startResult = serviceCall.Finish(currentUser.Id, request.CloseDetails);
-
-        if (startResult.IsFailure)
+        
+        var qrGuid = Guid.Parse(request.QrCode);
+        if (serviceCall.LocationId.Value != qrGuid)
         {
-            return startResult.Error;
+            return Error.Validation(
+                "ServiceCall.Finish.QrCode",
+                "Error validating the QR code.");
+        }
+
+        var finishResult = serviceCall.Finish(currentUser.Id, request.CloseDetails);
+
+        if (finishResult.IsFailure)
+        {
+            return finishResult.Error;
         }
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
