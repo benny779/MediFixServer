@@ -48,6 +48,7 @@ public class LocationsRepository(ApplicationDbContext dbContext)
         return ExistsAsync(loc =>
                 loc.Id != location.Id &&
                 loc.LocationType == location.LocationType &&
+                loc.ParentId == location.ParentId &&
                 loc.Name.Equals(location.Name),
             cancellationToken);
     }
