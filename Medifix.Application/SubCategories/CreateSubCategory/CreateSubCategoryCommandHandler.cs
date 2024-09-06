@@ -6,7 +6,7 @@ using MediFix.SharedKernel.Results;
 
 namespace MediFix.Application.SubCategories.CreateSubCategory;
 
-internal sealed class CreateSubCategoryCommandHHandler(
+internal sealed class CreateSubCategoryCommandHandler(
     ICategoryRepository categoryRepository,
     ISubCategoryRepository subCategoryRepository,
     IUnitOfWork unitOfWork)
