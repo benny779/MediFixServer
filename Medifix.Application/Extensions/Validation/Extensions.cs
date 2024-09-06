@@ -23,4 +23,11 @@ public static class Extensions
             .Equal(expression)
             .WithMessage("'{PropertyName}' must be equal to '{ComparisonProperty}'.");
     }
+
+    public static IRuleBuilderOptions<T, string> IsGuid<T>(this IRuleBuilder<T, string> ruleBuilder)
+    {
+        return ruleBuilder
+            .Must(value => Guid.TryParse(value, out _))
+            .WithMessage("'{PropertyName}' is not a Guid");
+    }
 }
