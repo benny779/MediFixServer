@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using MediFix.Application.Expertises.GetExpertiseBy;
 using MediFix.Application.Users.Practitioners.AddPractitionerExpertise;
 using MediFix.Application.Users.Practitioners.DeletePractitionerExpertise;
 using MediFix.Application.Users.Practitioners.GetPractitionerById;
@@ -6,10 +7,12 @@ using MediFix.Application.Users.Practitioners.GetPractitioners;
 using MediFix.Application.Users.Practitioners.GetPractitionersBySubOrCategory;
 using MediFix.Application.Users.UpdateUser;
 using MediFix.SharedKernel.Results;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace MediFix.Api.Controllers;
 
+[Authorize]
 public class PractitionersController(ISender sender) : ApiController
 {
     [HttpGet("{id:guid}")]
@@ -60,6 +63,16 @@ public class PractitionersController(ISender sender) : ApiController
         var result = await sender.Send(command, cancellationToken);
 
         return result.Match(NoContent, Problem);
+    }
+
+    [HttpGet("{id:guid}/expertises")]
+    public async Task<IActionResult> GetExpertises(Guid id, CancellationToken cancellationToken)
+    {
+        var query = new GetExpertiseByRequest(CategoryId: null, PractitionerId: id);
+
+        var result = await sender.Send(query, cancellationToken);
+
+        return result.Match(Ok, Problem);
     }
 
     [HttpPost("{id:guid}/expertises")]

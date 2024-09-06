@@ -5,6 +5,7 @@ using MediFix.Application.Categories.DeleteCategoryExpertise;
 using MediFix.Application.Categories.GetCategories;
 using MediFix.Application.Categories.GetCategory;
 using MediFix.Application.Categories.UpdateCategory;
+using MediFix.Application.Expertises.GetExpertiseBy;
 using MediFix.SharedKernel.Results;
 using Microsoft.AspNetCore.Mvc;
 
@@ -53,6 +54,16 @@ public class CategoriesController(ISender sender) : ApiController
         var result = await sender.Send(request, cancellationToken);
 
         return result.Match(NoContent, Problem);
+    }
+
+    [HttpGet("{id:guid}/expertises")]
+    public async Task<IActionResult> GetExpertises(Guid id, CancellationToken cancellationToken)
+    {
+        var query = new GetExpertiseByRequest(CategoryId: id, PractitionerId: null);
+
+        var result = await sender.Send(query, cancellationToken);
+
+        return result.Match(Ok, Problem);
     }
 
     [HttpPost("{id:guid}/expertises")]
