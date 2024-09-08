@@ -33,6 +33,14 @@ internal class ApplicationUserService(
         return userManager.UpdateAsync(user);
     }
 
+    public Task<IdentityResult> RevokeRefreshTokenAsync(ApplicationUser user)
+    {
+        user.RefreshToken = null;
+        user.RefreshTokenValidity = null;
+
+        return userManager.UpdateAsync(user);
+    }
+
     public Task<SignInResult> CheckPasswordSignInAsync(ApplicationUser user, string password)
     {
         return signInManager.CheckPasswordSignInAsync(user, password, LockoutOnFailure);

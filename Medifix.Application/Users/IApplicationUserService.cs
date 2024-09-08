@@ -11,5 +11,7 @@ public interface IApplicationUserService
 
     Task<IdentityResult> SetRefreshTokenAsync(ApplicationUser user, string refreshToken);
 
+    Task<IdentityResult> RevokeRefreshTokenAsync(ApplicationUser user);
+
     Task<SignInResult> CheckPasswordSignInAsync(ApplicationUser user, string password);
 }
