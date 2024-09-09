@@ -15,4 +15,20 @@ internal class EmailService(IFluentEmail fluentEmail) : IEmailService
 
         return response;
     }
+
+    public async Task<Result> SendEmailUsingTemplateAsync<T>(
+        string to,
+        string subject,
+        IEmailTemplate template,
+        T model,
+        CancellationToken cancellationToken = default)
+    {
+        var response = await Result.FromTryCatchAsync(() => fluentEmail
+            .To(to)
+            .Subject(subject)
+            .UsingTemplate(template.GetTemplate(), model)
+            .SendAsync(cancellationToken));
+
+        return response;
+    }
 }

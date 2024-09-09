@@ -118,7 +118,8 @@ public static class DependencyInjection
 
         var fluentEmail = services.AddFluentEmail(
             emailOptions.SenderEmail,
-            emailOptions.SenderName);
+            emailOptions.SenderName)
+            .AddRazorRenderer();
 
         if (emailOptions.UseAuth)
         {
