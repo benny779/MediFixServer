@@ -7,6 +7,7 @@ using MediFix.Domain.Locations;
 using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
 using MediFix.SharedKernel.Results;
+using Microsoft.EntityFrameworkCore;
 
 namespace MediFix.Application.ServiceCalls.CreateServiceCall;
 
@@ -40,11 +41,7 @@ internal sealed class CreateServiceCallCommandHandler(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        var mailResult = await emailService.SendEmailAsync(
-            currentUser.Email,
-            "Your service call was created successfully",
-            string.Empty,
-            cancellationToken);
+        var mailResult = await SendConfirmationEmail(serviceCall, cancellationToken);
 
         if (mailResult.IsFailure)
         {
@@ -54,5 +51,31 @@ internal sealed class CreateServiceCallCommandHandler(
         transaction.Commit();
 
         return new CreateServiceCallResponse(serviceCall.Id);
+    }
+
+    private async Task<Result> SendConfirmationEmail(
+        ServiceCall serviceCall,
+        CancellationToken cancellationToken)
+    {
+        var serviceCallResponse = (await serviceCallRepository
+            .ToResponse(sc => sc.Id == serviceCall.Id)
+            .AsNoTracking()
+            .SingleOrDefaultAsync(cancellationToken))!;
+
+        var model = new ServiceCallConfirmation(
+            currentUser.FullName,
+            serviceCallResponse.Location.ToPrint(),
+            serviceCall.ServiceCallType.ToString(),
+            serviceCallResponse.Category.Name, 
+            serviceCallResponse.SubCategory.Name, 
+            serviceCall.Priority.ToString(), 
+            serviceCall.Details);
+
+        return await emailService.SendEmailUsingTemplateAsync(
+            currentUser.Email,
+            "Service Call Confirmation",
+            new ServiceCallCreatedEmailTemplate(),
+            model,
+            cancellationToken);
     }
 }

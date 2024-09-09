@@ -27,8 +27,11 @@ public record ServiceCallLocations(
     ServiceCallLocation Building,
     ServiceCallLocation Floor,
     ServiceCallLocation Department,
-    ServiceCallLocation Room
-);
+    ServiceCallLocation Room)
+{
+    internal string ToPrint() =>
+        $"Building: {Building.Name}, Floor: {Floor.Name}, Department: {Department.Name}, Room: {Room.Name}";
+}
 
 public record ServiceCallLocation(
     Guid Id,
