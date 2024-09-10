@@ -50,7 +50,7 @@ internal sealed class GetServiceCallsWithFilterRequestHandler(
 
     private static IEnumerable<ServiceCallResponse> OrderServiceCallsResponse(
         IEnumerable<ServiceCallResponse> serviceCallsResponse,
-        bool isClient, 
+        bool isClient,
         bool isPractitioner)
     {
         return isClient
@@ -61,7 +61,9 @@ internal sealed class GetServiceCallsWithFilterRequestHandler(
                 ? serviceCallsResponse
                     .OrderBy(sc => (byte)sc.CurrentStatus.Status)
                     .ThenBy(sc => sc.DateCreated)
-                : serviceCallsResponse;
+                : serviceCallsResponse
+                    .OrderBy(sc => (byte)sc.CurrentStatus.Status)
+                    .ThenByDescending(sc => sc.DateCreated);
     }
 
     private static IQueryable<ServiceCall> FilterServiceCalls(
