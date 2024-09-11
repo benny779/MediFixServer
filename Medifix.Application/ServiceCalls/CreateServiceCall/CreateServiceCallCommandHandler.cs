@@ -63,7 +63,7 @@ internal sealed class CreateServiceCallCommandHandler(
             .SingleOrDefaultAsync(cancellationToken))!;
 
         var model = new ServiceCallConfirmation(
-            currentUser.FullName,
+            serviceCallResponse.Client.FullName,
             serviceCallResponse.Location.ToPrint(),
             serviceCall.ServiceCallType.ToString(),
             serviceCallResponse.Category.Name, 
@@ -72,7 +72,7 @@ internal sealed class CreateServiceCallCommandHandler(
             serviceCall.Details);
 
         return await emailService.SendEmailUsingTemplateAsync(
-            currentUser.Email,
+            serviceCallResponse.Client.Email,
             "Service Call Confirmation",
             new ServiceCallCreatedEmailTemplate(),
             model,

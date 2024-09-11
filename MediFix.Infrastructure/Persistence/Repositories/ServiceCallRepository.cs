@@ -35,6 +35,7 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                     new ServiceCallClient(
                         client.Id,
                         clientAppUser.FullName,
+                        clientAppUser.Email,
                         clientAppUser.PhoneNumber),
                     new ServiceCallLocations(
                         new ServiceCallLocation(

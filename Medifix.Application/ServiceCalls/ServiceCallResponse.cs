@@ -49,6 +49,7 @@ public record ServiceCallCategory(
 public record ServiceCallClient(
     Guid Id,
     string FullName,
+    string Email,
     string? PhoneNumber);
 
 public record ServiceCallPractitioner(
