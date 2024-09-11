@@ -7,6 +7,9 @@ public static class UserErrors
     public static Error PasswordsDoNotMatch
         => Error.Validation("Password.DoNotMatch", "The passwords do not match.");
 
+    public static Error LoginFailed
+        => Error.Validation("User.LoginFailed", "Please check your username and password, then try again.");
+
     public static Error LockedOut(string email)
         => Error.Unauthorized("User.LockedOut", $"The user '{email}' is locked out.");
 

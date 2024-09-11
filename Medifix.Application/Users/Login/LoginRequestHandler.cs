@@ -16,7 +16,7 @@ internal sealed class LoginRequestHandler(
 
         if (user is null)
         {
-            return Error.Unauthorized();
+            return UserErrors.LoginFailed;
         }
 
         var result = await applicationUserService
@@ -29,7 +29,7 @@ internal sealed class LoginRequestHandler(
 
         if (!result.Succeeded)
         {
-            return Error.Unauthorized();
+            return UserErrors.LoginFailed;
         }
 
         var tokensRequest = new GenerateAndUpdateTokensCommand(user);
