@@ -14,6 +14,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Identity.Client.Platforms.Features.DesktopOs.Kerberos;
+using System.Net;
+using System.Net.Mail;
 
 namespace MediFix.Infrastructure;
 
@@ -121,18 +124,17 @@ public static class DependencyInjection
             emailOptions.SenderName)
             .AddRazorRenderer();
 
-        if (emailOptions.UseAuth)
+        var smtpClient = new SmtpClient
         {
-            fluentEmail.AddSmtpSender(
-                emailOptions.SmtpServer,
-                emailOptions.SmtpPort,
-                emailOptions.Username,
-                emailOptions.Password);
-        }
-        else
-        {
-            fluentEmail.AddSmtpSender(emailOptions.SmtpServer, emailOptions.SmtpPort);
-        }
+            Host = emailOptions.SmtpServer,
+            Port = emailOptions.SmtpPort,
+            EnableSsl = emailOptions.EnableSsl,
+            Credentials = emailOptions.UseAuth 
+                ? new NetworkCredential(emailOptions.Username, emailOptions.Password) 
+                : null
+        };
+
+        fluentEmail.AddSmtpSender(smtpClient);
 
         services.AddTransient<IEmailService, EmailService>();
 

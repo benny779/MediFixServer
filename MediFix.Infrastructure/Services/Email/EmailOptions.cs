@@ -6,6 +6,7 @@ public class EmailOptions
 
     public string SmtpServer { get; init; } = null!;
     public int SmtpPort { get; init; }
+    public bool EnableSsl { get; init; }
     public string? Username { get; init; }
     public string? Password { get; init; }
     public string SenderEmail { get; init; } = null!;

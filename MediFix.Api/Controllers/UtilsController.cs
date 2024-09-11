@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using MediFix.Application.Utils.Email.TestEmail;
+using MediFix.Application.Utils.Email.TestEmailTemplate;
 using MediFix.Application.Utils.Persistence.ResetDb;
 using MediFix.Application.Utils.Persistence.Seed;
 using MediFix.SharedKernel.Results;
@@ -20,6 +22,22 @@ public class UtilsController(ISender sender) : ApiController
     public async Task<IActionResult> Seed(CancellationToken cancellationToken)
     {
         var result = await sender.Send(new SeedDataCommand(), cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+    [HttpPost("email/test")]
+    public async Task<IActionResult> TestEmail(TestEmailCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
+
+        return result.Match(Ok, Problem);
+    }
+
+    [HttpPost("email/test-template")]
+    public async Task<IActionResult> TestEmailTemplate(TestEmailTemplateCommand command, CancellationToken cancellationToken)
+    {
+        var result = await sender.Send(command, cancellationToken);
 
         return result.Match(Ok, Problem);
     }
