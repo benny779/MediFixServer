@@ -55,4 +55,5 @@ public record ServiceCallClient(
 public record ServiceCallPractitioner(
     Guid Id,
     string FullName,
+    string Email,
     string? PhoneNumber);

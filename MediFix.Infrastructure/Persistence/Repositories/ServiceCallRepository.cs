@@ -71,6 +71,7 @@ public class ServiceCallRepository(ApplicationDbContext dbContext)
                         ? new ServiceCallPractitioner(
                             pracAppUser.Id,
                             pracAppUser.FullName,
+                            pracAppUser.Email,
                             pracAppUser.PhoneNumber)
                         : null);
     }
