@@ -4,9 +4,11 @@ namespace MediFix.Application.ServiceCalls.CreateServiceCall;
 
 public sealed class ServiceCallCreatedEmailTemplate : IEmailTemplate
 {
+    public string GetTemplate() => Template;
+
     private const string Template = """
                                     @using MediFix.Application.ServiceCalls.CreateServiceCall;
-                                    @model ServiceCallConfirmation
+                                    @model ServiceCallCreatedEmailModel
 
                                     <!DOCTYPE html>
                                     <html lang="en">
@@ -67,6 +69,4 @@ public sealed class ServiceCallCreatedEmailTemplate : IEmailTemplate
                                     </body>
                                     </html>
                                     """;
-
-    public string GetTemplate() => Template;
 }

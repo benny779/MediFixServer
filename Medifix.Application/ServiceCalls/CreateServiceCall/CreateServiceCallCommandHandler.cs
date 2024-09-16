@@ -62,7 +62,7 @@ internal sealed class CreateServiceCallCommandHandler(
             .AsNoTracking()
             .SingleOrDefaultAsync(cancellationToken))!;
 
-        var model = new ServiceCallConfirmation(
+        var model = new ServiceCallCreatedEmailModel(
             serviceCallResponse.Client.FullName,
             serviceCallResponse.Location.ToPrint(),
             serviceCall.ServiceCallType.ToString(),

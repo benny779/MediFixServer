@@ -13,7 +13,7 @@ internal sealed class TestEmailTemplateCommandHandler(
 {
     public Task<Result> Handle(TestEmailTemplateCommand request, CancellationToken cancellationToken)
     {
-        var model = new ServiceCallConfirmation(
+        var model = new ServiceCallCreatedEmailModel(
             "Israel Israeli",
             "Location Details",
             "New",

@@ -1,6 +1,6 @@
 ﻿namespace MediFix.Application.ServiceCalls.CreateServiceCall;
 
-public record ServiceCallConfirmation(
+public record ServiceCallCreatedEmailModel(
     string FullName,
     string Location,
     string Type,
