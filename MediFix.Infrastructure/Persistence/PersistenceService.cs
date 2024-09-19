@@ -1,4 +1,5 @@
-﻿using MediFix.Application.Abstractions.Data;
+﻿using Bogus;
+using MediFix.Application.Abstractions.Data;
 using MediFix.Application.Extensions;
 using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
@@ -6,8 +7,8 @@ using MediFix.Application.Utils.Persistence;
 using MediFix.Domain.Categories;
 using MediFix.Domain.Expertises;
 using MediFix.Domain.Locations;
-using MediFix.Domain.ServiceCalls;
 using MediFix.Domain.Users;
+using MediFix.Infrastructure.Services.Fakers;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +21,15 @@ internal class PersistenceService(
     : IPersistenceService
 {
     private const string DefaultPassword = "Aq123456!";
+    private const int FakeClientsCount = 50;
+    private const int FakeServiceCallsCount = 500;
+    private const int FakeServiceCallsStartDateMonths = 3;
+    private const int FakeBuildingsCount = 3;
+    private const int FakeFloorsCount = 4;
+    private const int FakeDepartmentsCount = 4;
+    private const int FakeRoomsCount = 10;
+
+    private readonly Faker _faker = new();
 
     public async Task<Result> ResetDb()
     {
@@ -36,22 +46,30 @@ internal class PersistenceService(
     public async Task<Result> SeedData()
     {
         // Expertises
+        var expertiseGeneral = new Expertise(ExpertiseId.Create(), "General");
         var expertisePlumbing = new Expertise(ExpertiseId.Create(), "Plumbing");
         var expertiseAirConditioning = new Expertise(ExpertiseId.Create(), "Air conditioning");
         var expertiseElectricity = new Expertise(ExpertiseId.Create(), "Electricity");
+        IList<Expertise> expertises =
+            [expertiseGeneral, expertisePlumbing, expertiseAirConditioning, expertiseElectricity];
 
 
         // Categories
+        var categoryGeneral = new Category(CategoryId.Create(), "General");
+        categoryGeneral.AddExpertise(expertiseGeneral);
         var categoryPlumbing = new Category(CategoryId.Create(), "Plumbing");
-        var categoryAirConditioning = new Category(CategoryId.Create(), "Air conditioning");
-        var categoryElectricity = new Category(CategoryId.Create(), "Electricity");
-
         categoryPlumbing.AddExpertise(expertisePlumbing);
+        var categoryAirConditioning = new Category(CategoryId.Create(), "Air conditioning");
         categoryAirConditioning.AddExpertise(expertiseAirConditioning);
+        var categoryElectricity = new Category(CategoryId.Create(), "Electricity");
         categoryElectricity.AddExpertise(expertiseElectricity);
+        IList<Category> categories =
+            [categoryGeneral, categoryPlumbing, categoryAirConditioning, categoryElectricity];
 
 
         // Sub categories
+        var general = new SubCategory(SubCategoryId.Create(), "General", categoryGeneral.Id);
+
         var toilet = new SubCategory(SubCategoryId.Create(), "Toilet", categoryPlumbing.Id);
         var tap = new SubCategory(SubCategoryId.Create(), "Tap", categoryPlumbing.Id);
         var waterBar = new SubCategory(SubCategoryId.Create(), "Water Bar", categoryPlumbing.Id);
@@ -62,31 +80,43 @@ internal class PersistenceService(
         var bulb = new SubCategory(SubCategoryId.Create(), "Bulb replacement", categoryElectricity.Id);
         var sockets = new SubCategory(SubCategoryId.Create(), "No electricity in the sockets", categoryElectricity.Id);
 
+        IList<SubCategory> subCategories =
+            [general, toilet, tap, waterBar, cool, noise, bulb, sockets];
+
 
         // Locations
         var locations = GetLocations();
 
 
         // Application users
-        var applicationUserClient = GetApplicationUserClient();
-        var applicationUserManager = GetApplicationUserManager();
-        var applicationUserPlumbing = GetApplicationUserPlumbing();
-        var applicationUserPlumbing2 = GetApplicationUserPlumbing2();
-        var applicationUserAirConditioning = GetApplicationUserAirConditioning();
-        var applicationUserAirConditioning2 = GetApplicationUserAirConditioning2();
-        var applicationUserElectricity = GetApplicationUserElectricity();
-        var applicationUserElectricity2 = GetApplicationUserElectricity2();
+        var appUserClient = CreateApplicationUser(UserType.Client, "client");
+        var appUserClients = Enumerable.Range(0, FakeClientsCount)
+            .Select(x => CreateApplicationUser(UserType.Client, $"{_faker.Internet.UserName()}{x}"))
+            .ToList();
+        var appUserManager = CreateApplicationUser(UserType.Manager, "manager");
+        var appUserPlumbing = CreateApplicationUser(UserType.Practitioner, "plumb");
+        var appUserPlumbing2 = CreateApplicationUser(UserType.Practitioner, "plumb2");
+        var appUserAirConditioning = CreateApplicationUser(UserType.Practitioner, "air");
+        var appUserAirConditioning2 = CreateApplicationUser(UserType.Practitioner, "air2");
+        var appUserElectricity = CreateApplicationUser(UserType.Practitioner, "elec");
+        var appUserElectricity2 = CreateApplicationUser(UserType.Practitioner, "elec2");
+        IList<ApplicationUser> applicationUsers =
+        [
+            appUserClient, .. appUserClients, appUserManager, appUserPlumbing, appUserPlumbing2,
+            appUserAirConditioning, appUserAirConditioning2, appUserElectricity, appUserElectricity2
+        ];
 
 
         // Domain users
-        var client = Client.Create(ClientId.From(applicationUserClient.Id)).Value;
-        var manager = Manager.Create(ManagerId.From(applicationUserManager.Id)).Value;
-        var practitionerPlumbing = Practitioner.Create(PractitionerId.From(applicationUserPlumbing.Id)).Value;
-        var practitionerPlumbing2 = Practitioner.Create(PractitionerId.From(applicationUserPlumbing2.Id)).Value;
-        var practitionerAirConditioning = Practitioner.Create(PractitionerId.From(applicationUserAirConditioning.Id)).Value;
-        var practitionerAirConditioning2 = Practitioner.Create(PractitionerId.From(applicationUserAirConditioning2.Id)).Value;
-        var practitionerElectricity = Practitioner.Create(PractitionerId.From(applicationUserElectricity.Id)).Value;
-        var practitionerElectricity2 = Practitioner.Create(PractitionerId.From(applicationUserElectricity2.Id)).Value;
+        var client = Client.Create(ClientId.From(appUserClient.Id)).Value;
+        var fakeClients = appUserClients.Select(c => Client.Create(ClientId.From(c.Id)).Value);
+        var manager = Manager.Create(ManagerId.From(appUserManager.Id)).Value;
+        var practitionerPlumbing = Practitioner.Create(PractitionerId.From(appUserPlumbing.Id)).Value;
+        var practitionerPlumbing2 = Practitioner.Create(PractitionerId.From(appUserPlumbing2.Id)).Value;
+        var practitionerAirConditioning = Practitioner.Create(PractitionerId.From(appUserAirConditioning.Id)).Value;
+        var practitionerAirConditioning2 = Practitioner.Create(PractitionerId.From(appUserAirConditioning2.Id)).Value;
+        var practitionerElectricity = Practitioner.Create(PractitionerId.From(appUserElectricity.Id)).Value;
+        var practitionerElectricity2 = Practitioner.Create(PractitionerId.From(appUserElectricity2.Id)).Value;
 
         practitionerPlumbing.AddExpertise(expertisePlumbing);
         practitionerPlumbing2.AddExpertise(expertisePlumbing);
@@ -95,66 +125,55 @@ internal class PersistenceService(
         practitionerElectricity.AddExpertise(expertiseElectricity);
         practitionerElectricity2.AddExpertise(expertiseElectricity);
 
+        IList<Client> clients = [client, .. fakeClients];
+        IList<Practitioner> practitioners =
+        [
+            practitionerPlumbing, practitionerPlumbing2, practitionerAirConditioning,
+            practitionerAirConditioning2, practitionerElectricity, practitionerElectricity2
+        ];
+        foreach (var practitioner in practitioners)
+        {
+            practitioner.AddExpertise(expertiseGeneral);
+        }
+
 
         // ServiceCalls
-        var allRooms = locations
+        var rooms = locations
             .Where(location => location.LocationType == LocationType.Room)
             .ToArray();
 
-        Random.Shared.Shuffle(allRooms);
+        var serviceCallFaker = new ServiceCallFakerFactory(
+            DateTime.Now.AddMonths(-FakeServiceCallsStartDateMonths),
+            DateTime.Now,
+            clients,
+            rooms,
+            categories,
+            subCategories,
+            practitioners,
+            manager.Id);
 
-        var rooms = allRooms.Take(3).ToList();
-
-        var serviceCallNew = ServiceCall.Create(client.Id, rooms[0].Id, ServiceCallType.Repair, cool.Id, "Not cool...").Value;
-
-        var serviceCallFinished = ServiceCall.Create(client.Id, rooms[1].Id, ServiceCallType.Repair, bulb.Id, "It's dark here").Value;
-        serviceCallFinished.AssignPractitioner(manager.Id, practitionerElectricity.Id);
-        serviceCallFinished.Start(practitionerElectricity.Id);
-        serviceCallFinished.Finish(practitionerElectricity.Id, "replace the bulb.");
-
-        var serviceCallCancelled = ServiceCall.Create(client.Id, rooms[2].Id, ServiceCallType.New, sockets.Id, "The sockets don't work - no electricity", ServiceCallPriority.High).Value;
-        serviceCallCancelled.Cancel(client.Id);
-
+        var serviceCalls = serviceCallFaker.Generate(FakeServiceCallsCount);
 
 
         // Persist
         using var transaction = await unitOfWork.BeginTransactionAsync();
 
-        context.Categories.AddRange(categoryPlumbing, categoryAirConditioning, categoryElectricity);
-        context.SubCategories.AddRange(toilet, tap, waterBar, cool, noise, bulb, sockets);
+        context.Categories.AddRange(categories);
+        context.SubCategories.AddRange(subCategories);
         context.Locations.AddRange(locations);
-        context.Expertises.AddRange(expertisePlumbing, expertiseAirConditioning, expertiseElectricity);
-        context.Clients.Add(client);
+        context.Expertises.AddRange(expertises);
+        context.Clients.AddRange(clients);
         context.Managers.Add(manager);
-        context.Practitioners.AddRange(
-            practitionerPlumbing,
-            practitionerPlumbing2,
-            practitionerAirConditioning,
-            practitionerAirConditioning2,
-            practitionerElectricity,
-            practitionerElectricity2);
-        context.ServiceCalls.AddRange(serviceCallNew, serviceCallFinished, serviceCallCancelled);
+        context.Practitioners.AddRange(practitioners);
+        context.ServiceCalls.AddRange(serviceCalls);
 
-        var createClientResult = await applicationUserService.CreateAsync(applicationUserClient, DefaultPassword);
-        var createManagerResult = await applicationUserService.CreateAsync(applicationUserManager, DefaultPassword);
-        var createPlumbingResult = await applicationUserService.CreateAsync(applicationUserPlumbing, DefaultPassword);
-        var createPlumbing2Result = await applicationUserService.CreateAsync(applicationUserPlumbing2, DefaultPassword);
-        var createAirConditioningResult = await applicationUserService.CreateAsync(applicationUserAirConditioning, DefaultPassword);
-        var createAirConditioning2Result = await applicationUserService.CreateAsync(applicationUserAirConditioning2, DefaultPassword);
-        var createElectricityResult = await applicationUserService.CreateAsync(applicationUserElectricity, DefaultPassword);
-        var createElectricity2Result = await applicationUserService.CreateAsync(applicationUserElectricity2, DefaultPassword);
 
-        List<IdentityResult> createResults =
-        [
-            createClientResult,
-            createManagerResult,
-            createPlumbingResult,
-            createPlumbing2Result,
-            createAirConditioningResult,
-            createAirConditioning2Result,
-            createElectricityResult,
-            createElectricity2Result
-        ];
+        List<IdentityResult> createResults = [];
+
+        foreach (var applicationUser in applicationUsers)
+        {
+            createResults.Add(await applicationUserService.CreateAsync(applicationUser, DefaultPassword));
+        }
 
         if (createResults.Any(result => !result.Succeeded))
         {
@@ -172,137 +191,52 @@ internal class PersistenceService(
 
 
 
-    private List<Location> CreateLocations(Location? parent, LocationType type, int first, int count)
+    private static IEnumerable<Location> CreateLocations(Location? parent, LocationType type, int first, int count)
     {
         return Enumerable.Range(first, count)
-             .Select(x => Location.Create(LocationId.Create(), type, $"{type} {x}", parent).Value)
-             .ToList();
+             .Select(x => Location.Create(LocationId.Create(), type, $"{type} {x}", parent).Value);
     }
 
-    private List<Location> GetLocations()
+    private static List<Location> GetLocations()
     {
-        var buildings = CreateLocations(null, LocationType.Building, 1, 3)
+        var buildings = CreateLocations(null, LocationType.Building, 1, FakeBuildingsCount)
             .ToList();
 
         var floors = buildings
-            .SelectMany(building => CreateLocations(building, LocationType.Floor, ExtractNumbers(building.Name), 4))
+            .SelectMany(building => CreateLocations(building, LocationType.Floor, ExtractNumbers(building.Name), FakeFloorsCount))
             .ToList();
 
         var departments = floors
-            .SelectMany(floor => CreateLocations(floor, LocationType.Department, ExtractNumbers(floor.Name), 4))
+            .SelectMany(floor => CreateLocations(floor, LocationType.Department, ExtractNumbers(floor.Name), FakeDepartmentsCount))
             .ToList();
 
         var rooms = departments
-            .SelectMany(dep => CreateLocations(dep, LocationType.Room, ExtractNumbers(dep.Name) * 2 + 100, 10))
+            .SelectMany(dep => CreateLocations(dep, LocationType.Room, ExtractNumbers(dep.Name) * 2 + 100, FakeRoomsCount))
             .ToList();
 
 
         return [.. buildings, .. floors, .. departments, .. rooms];
     }
 
-
-    private static ApplicationUser GetApplicationUserClient()
+    private ApplicationUser CreateApplicationUser(UserType userType, string userName)
     {
+        var email = $"{userName}@medifix.com";
+
         return new ApplicationUser
         {
-            Type = UserType.Client,
-            Email = "client@medifix.com",
-            UserName = "client@medifix.com",
-            FirstName = "Client",
-            LastName = "Client",
+            Type = userType,
+            Email = email,
+            UserName = email,
+            FirstName = _faker.Name.FirstName(),
+            LastName = _faker.Name.LastName()
         };
     }
-
-    private static ApplicationUser GetApplicationUserManager()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Manager,
-            Email = "manager@medifix.com",
-            UserName = "manager@medifix.com",
-            FirstName = "Manager",
-            LastName = "Manager",
-        };
-    }
-
-    private static ApplicationUser GetApplicationUserPlumbing()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Practitioner,
-            Email = "plumbing1@medifix.com",
-            UserName = "plumbing1@medifix.com",
-            FirstName = "1",
-            LastName = "Plumbing",
-        };
-    }
-
-    private static ApplicationUser GetApplicationUserPlumbing2()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Practitioner,
-            Email = "plumbing2@medifix.com",
-            UserName = "plumbing2@medifix.com",
-            FirstName = "2",
-            LastName = "Plumbing",
-        };
-    }
-
-    private static ApplicationUser GetApplicationUserAirConditioning()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Practitioner,
-            Email = "air1@medifix.com",
-            UserName = "air1@medifix.com",
-            FirstName = "1",
-            LastName = "Air conditioning",
-        };
-    }
-
-    private static ApplicationUser GetApplicationUserAirConditioning2()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Practitioner,
-            Email = "air2@medifix.com",
-            UserName = "air2@medifix.com",
-            FirstName = "2",
-            LastName = "Air conditioning",
-        };
-    }
-
-    private static ApplicationUser GetApplicationUserElectricity()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Practitioner,
-            Email = "electricity1@medifix.com",
-            UserName = "electricity1@medifix.com",
-            FirstName = "1",
-            LastName = "Electricity",
-        };
-    }
-
-    private static ApplicationUser GetApplicationUserElectricity2()
-    {
-        return new ApplicationUser
-        {
-            Type = UserType.Practitioner,
-            Email = "electricity2@medifix.com",
-            UserName = "electricity2@medifix.com",
-            FirstName = "2",
-            LastName = "Electricity",
-        };
-    }
-
 
     private static int ExtractNumbers(string str)
     {
         var digits = str.Where(char.IsDigit).ToArray();
-        
-        return digits.Length > 0 
+
+        return digits.Length > 0
             ? int.Parse(new string(digits))
             : throw new InvalidOperationException();
     }
