@@ -38,10 +38,20 @@ internal sealed class GetPractitionersBySubOrCategoryRequestHandler(
     {
         const string byCategoryQuery = """
                                        SELECT	p.Id AS PractitionerId,
-                                             		anu.FirstName,
-                                             		anu.LastName,
-                                             		Count( svc.Id ) AS AssignedServiceCalls,
-                                             		Count( svc_start.Id ) AS StartedServiceCalls
+                                       		anu.FirstName,
+                                       		anu.LastName,
+                                       		(
+                                       			SELECT	Count( 'benny' )
+                                       			FROM	dbo.ServiceCalls AS sc
+                                       			WHERE	sc.PractitionerId = p.Id
+                                       			AND		sc.Status IN ( 2, 3 )
+                                       		) AS AssignedServiceCalls,
+                                       		(
+                                       			SELECT	Count( 'benny' )
+                                       			FROM	dbo.ServiceCalls AS sc
+                                       			WHERE	sc.PractitionerId = p.Id
+                                       			AND		sc.Status = 3
+                                       		) AS StartedServiceCalls
                                        FROM	dbo.Practitioners AS p
                                        INNER JOIN dbo.AspNetUsers AS anu
                                        ON p.Id = anu.Id
@@ -53,12 +63,6 @@ internal sealed class GetPractitionersBySubOrCategoryRequestHandler(
                                        ON e.Id = ce.AllowedExpertisesId
                                        INNER JOIN dbo.Categories AS c
                                        ON ce.CategoriesId = c.Id
-                                       LEFT OUTER JOIN dbo.ServiceCalls AS svc
-                                       ON	p.Id = svc.PractitionerId
-                                       AND svc.Status IN ( 2, 3 )
-                                       LEFT OUTER JOIN dbo.ServiceCalls AS svc_start
-                                       ON	p.Id = svc_start.PractitionerId
-                                       AND svc.Status = 3
                                        WHERE c.Id = @CategoryId
                                        GROUP BY p.Id, anu.FirstName, anu.LastName
                                        """;
@@ -67,8 +71,18 @@ internal sealed class GetPractitionersBySubOrCategoryRequestHandler(
                            SELECT	p.Id AS PractitionerId,
                            		anu.FirstName,
                            		anu.LastName,
-                           		Count( svc.Id ) AS AssignedServiceCalls,
-                           		Count( svc_start.Id ) AS StartedServiceCalls
+                           		(
+                           			SELECT	Count( 'benny' )
+                           			FROM	dbo.ServiceCalls AS sc
+                           			WHERE	sc.PractitionerId = p.Id
+                           			AND		sc.Status IN ( 2, 3 )
+                           		) AS AssignedServiceCalls,
+                           		(
+                           			SELECT	Count( 'benny' )
+                           			FROM	dbo.ServiceCalls AS sc
+                           			WHERE	sc.PractitionerId = p.Id
+                           			AND		sc.Status = 3
+                           		) AS StartedServiceCalls
                            FROM	dbo.Practitioners AS p
                            INNER JOIN dbo.AspNetUsers AS anu
                            ON p.Id = anu.Id
@@ -82,12 +96,6 @@ internal sealed class GetPractitionersBySubOrCategoryRequestHandler(
                            ON ce.CategoriesId = c.Id
                            INNER JOIN dbo.SubCategories AS sc
                            ON c.Id = sc.CategoryId
-                           LEFT OUTER JOIN dbo.ServiceCalls AS svc
-                           ON	p.Id = svc.PractitionerId
-                           AND svc.Status IN ( 2, 3 )
-                           LEFT OUTER JOIN dbo.ServiceCalls AS svc_start
-                           ON	p.Id = svc_start.PractitionerId
-                           AND svc.Status = 3
                            WHERE sc.Id = @SubCategoryId
                            GROUP BY p.Id, anu.FirstName, anu.LastName
                            """;
