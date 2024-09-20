@@ -129,14 +129,21 @@ public static class DependencyInjection
             Host = emailOptions.SmtpServer,
             Port = emailOptions.SmtpPort,
             EnableSsl = emailOptions.EnableSsl,
-            Credentials = emailOptions.UseAuth 
-                ? new NetworkCredential(emailOptions.Username, emailOptions.Password) 
+            Credentials = emailOptions.UseAuth
+                ? new NetworkCredential(emailOptions.Username, emailOptions.Password)
                 : null
         };
 
         fluentEmail.AddSmtpSender(smtpClient);
 
-        services.AddTransient<IEmailService, EmailService>();
+        if (emailOptions.IsDisabled)
+        {
+            services.AddTransient<IEmailService, DisabledEmailService>();
+        }
+        else
+        {
+            services.AddTransient<IEmailService, EmailService>();
+        }
 
         return services;
     }

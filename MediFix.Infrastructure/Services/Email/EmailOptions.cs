@@ -12,6 +12,7 @@ public class EmailOptions
     public string SenderEmail { get; init; } = null!;
     public string SenderName { get; init; } = null!;
     public string? To { get; init; }
+    public bool IsDisabled { get; init; }
 
     public bool UseAuth => Username is not null && Password is not null;
 }
