@@ -228,7 +228,8 @@ internal class PersistenceService(
             Email = email,
             UserName = email,
             FirstName = _faker.Name.FirstName(),
-            LastName = _faker.Name.LastName()
+            LastName = _faker.Name.LastName(),
+            PhoneNumber = $"05{_faker.Phone.PhoneNumber("########")}"
         };
     }
 
