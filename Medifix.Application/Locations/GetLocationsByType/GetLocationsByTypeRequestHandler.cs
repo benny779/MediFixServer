@@ -10,7 +10,7 @@ internal sealed class GetLocationsByTypeRequestHandler(
     public async Task<Result<GetLocationsByTypeResponse>> Handle(GetLocationsByTypeRequest request, CancellationToken cancellationToken)
     {
         var locationsResult = await locationsRepository
-            .GetByType(request.LocationType, cancellationToken);
+            .GetByType(request.LocationType, request.WithInactive, cancellationToken);
 
         if (locationsResult.IsFailure)
         {

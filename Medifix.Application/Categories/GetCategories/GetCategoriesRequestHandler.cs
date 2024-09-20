@@ -1,4 +1,5 @@
 ﻿using MediFix.Application.Abstractions.Messaging;
+using MediFix.Application.Extensions;
 using MediFix.SharedKernel.Results;
 
 namespace MediFix.Application.Categories.GetCategories;
@@ -9,7 +10,12 @@ internal sealed class GetCategoriesRequestHandler(
 {
     public async Task<Result<CategoriesResponse>> Handle(GetCategoriesRequest request, CancellationToken cancellationToken)
     {
-        var categories = await categoryRepository.GetAllAsync(cancellationToken);
+        var categories = request.WithInactive ?
+            await categoryRepository.GetAllAsync(cancellationToken) :
+            await categoryRepository
+                .GetQueryable()
+                .Where(c => c.IsActive)
+                .ResultToListAsync(cancellationToken);
 
         if (categories.IsFailure)
         {

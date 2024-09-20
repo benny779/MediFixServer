@@ -3,5 +3,5 @@ using MediFix.Domain.Locations;
 
 namespace MediFix.Application.Locations.GetLocationChildren;
 
-public record GetLocationChildrenRequest(LocationId LocationId)
+public record GetLocationChildrenRequest(LocationId LocationId, bool WithInactive)
     : IQuery<GetLocationChildrenResponse>;

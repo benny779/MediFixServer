@@ -26,9 +26,9 @@ public class LocationsController(ISender sender) : ApiController
     //}
 
     [HttpGet("types/{locationType:int}")]
-    public async Task<IActionResult> GetByLocationType(byte locationType, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetByLocationType(byte locationType, bool withInactive, CancellationToken cancellationToken)
     {
-        var query = new GetLocationsByTypeRequest((LocationType)locationType);
+        var query = new GetLocationsByTypeRequest((LocationType)locationType, withInactive);
 
         var result = await sender.Send(query, cancellationToken);
 
@@ -61,10 +61,10 @@ public class LocationsController(ISender sender) : ApiController
     }
 
     [HttpGet("{id:guid}/children")]
-    public async Task<IActionResult> GetChildren(Guid id, CancellationToken cancellationToken)
+    public async Task<IActionResult> GetChildren(Guid id, bool withInactive, CancellationToken cancellationToken)
     {
         var locationId = LocationId.From(id);
-        var query = new GetLocationChildrenRequest(locationId);
+        var query = new GetLocationChildrenRequest(locationId, withInactive);
 
         var locationsResult = await sender.Send(query, cancellationToken);
 

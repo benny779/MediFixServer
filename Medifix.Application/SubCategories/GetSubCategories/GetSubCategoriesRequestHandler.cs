@@ -15,6 +15,11 @@ internal class GetSubCategoriesRequestHandler(
     {
         var query = subCategoryRepository.GetQueryable();
 
+        if (!request.WithInactive)
+        {
+            query = query.Where(sc => sc.IsActive);
+        }
+
         if (request.CategoryId.HasValue)
         {
             var categoryId = CategoryId.From(request.CategoryId.Value);

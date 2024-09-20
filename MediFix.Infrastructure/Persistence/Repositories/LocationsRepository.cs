@@ -9,11 +9,15 @@ namespace MediFix.Infrastructure.Persistence.Repositories;
 public class LocationsRepository(ApplicationDbContext dbContext)
     : Repository<Location, LocationId>(dbContext), ILocationsRepository
 {
-    public async Task<Result<List<Location>>> GetByType(LocationType locationType, CancellationToken cancellationToken = default)
+    public async Task<Result<List<Location>>> GetByType(
+        LocationType locationType,
+        bool withInactive,
+        CancellationToken cancellationToken = default)
     {
         var locations = await dbContext
             .Locations
             .Where(loc => loc.LocationType == locationType)
+            .Where(loc => withInactive || loc.IsActive)
             .ToListAsync(cancellationToken);
 
         if (locations.IsEmpty())
@@ -26,11 +30,15 @@ public class LocationsRepository(ApplicationDbContext dbContext)
         return locations;
     }
 
-    public async Task<Result<List<Location>>> GetChildren(LocationId locationId, CancellationToken cancellationToken = default)
+    public async Task<Result<List<Location>>> GetChildren(
+        LocationId locationId,
+        bool withInactive, 
+        CancellationToken cancellationToken = default)
     {
         var locations = await dbContext
             .Locations
             .Where(loc => loc.ParentId == locationId)
+            .Where(loc => withInactive || loc.IsActive)
             .ToListAsync(cancellationToken);
 
         if (locations.IsEmpty())

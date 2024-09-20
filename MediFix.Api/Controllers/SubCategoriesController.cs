@@ -11,9 +11,12 @@ namespace MediFix.Api.Controllers;
 public class SubCategoriesController(ISender sender) : ApiController
 {
     [HttpGet]
-    public async Task<IActionResult> Get([FromQuery] Guid? categoryId, CancellationToken cancellationToken)
+    public async Task<IActionResult> Get(
+        [FromQuery] Guid? categoryId,
+        [FromQuery] bool withInactive,
+        CancellationToken cancellationToken)
     {
-        var query = new GetSubCategoriesRequest(categoryId);
+        var query = new GetSubCategoriesRequest(categoryId, withInactive);
 
         var result = await sender.Send(query, cancellationToken);
 

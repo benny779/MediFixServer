@@ -2,4 +2,5 @@
 
 namespace MediFix.Application.SubCategories.GetSubCategories;
 
-public record GetSubCategoriesRequest(Guid? CategoryId) : IQuery<SubCategoriesResponse>;
+public record GetSubCategoriesRequest(Guid? CategoryId, bool WithInactive) 
+    : IQuery<SubCategoriesResponse>;

@@ -2,4 +2,4 @@
 
 namespace MediFix.Application.Categories.GetCategories;
 
-public record GetCategoriesRequest : IQuery<CategoriesResponse>;
+public record GetCategoriesRequest(bool WithInactive) : IQuery<CategoriesResponse>;

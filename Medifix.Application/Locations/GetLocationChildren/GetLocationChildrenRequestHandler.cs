@@ -11,7 +11,8 @@ internal sealed class GetLocationChildrenRequestHandler(
         GetLocationChildrenRequest request,
         CancellationToken cancellationToken)
     {
-        var locationsResult = await locationsRepository.GetChildren(request.LocationId, cancellationToken);
+        var locationsResult = await locationsRepository
+            .GetChildren(request.LocationId, request.WithInactive, cancellationToken);
 
         if (locationsResult.IsFailure)
         {

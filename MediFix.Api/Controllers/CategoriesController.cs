@@ -14,9 +14,9 @@ namespace MediFix.Api.Controllers;
 public class CategoriesController(ISender sender) : ApiController
 {
     [HttpGet]
-    public async Task<IActionResult> Get(CancellationToken cancellationToken)
+    public async Task<IActionResult> Get([FromQuery] bool withInactive, CancellationToken cancellationToken)
     {
-        var query = new GetCategoriesRequest();
+        var query = new GetCategoriesRequest(withInactive);
 
         var result = await sender.Send(query, cancellationToken);
 
