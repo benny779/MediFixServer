@@ -80,33 +80,42 @@ internal sealed class GetDashboardRequestHandler(
                 SELECT	p.Id AS PractitionerId,
                 		anu.FirstName,
                 		anu.LastName,
-                		Count( svc_assign.Id ) AS Assigned,
-                		Count( svc_start.Id ) AS Started,
-                		Count( svc_finish.Id ) AS Finished,
-                		Avg( dur.Duration ) AS AvgDurationMinutes
+                		(
+                			SELECT	Count( 'benny' )
+                			FROM	#serviceCalls AS sc
+                			WHERE	sc.PractitionerId = p.Id
+                			AND		sc.Status = 2
+                		) AS Assigned,
+                		(
+                			SELECT	Count( 'benny' )
+                			FROM	#serviceCalls AS sc
+                			WHERE	sc.PractitionerId = p.Id
+                			AND		sc.Status = 3
+                		) AS Started,
+                		(
+                			SELECT	Count( 'benny' )
+                			FROM	#serviceCalls AS sc
+                			WHERE	sc.PractitionerId = p.Id
+                			AND		sc.Status = 4
+                		) AS Finished,
+                		(
+                			SELECT	Avg( DateDiff( MINUTE, assign_time.DateTime, IsNull( finish_time.DateTime, GetDate())))
+                			FROM	dbo.Practitioners AS prac
+                			INNER JOIN #serviceCalls AS sc
+                			ON prac.Id = sc.PractitionerId
+                			INNER JOIN dbo.ServiceCallStatusUpdate AS assign_time
+                			ON	sc.Id = assign_time.ServiceCallId
+                			AND assign_time.PractitionerId = prac.Id
+                			AND assign_time.Status = 2
+                			LEFT OUTER JOIN dbo.ServiceCallStatusUpdate AS finish_time
+                			ON	sc.Id = finish_time.ServiceCallId
+                			AND finish_time.PractitionerId = prac.Id
+                			AND finish_time.Status = 4
+                			WHERE prac.Id = p.Id
+                		) AS AvgDurationMinutes
                 FROM	dbo.Practitioners AS p
                 INNER JOIN dbo.AspNetUsers AS anu
                 ON p.Id = anu.Id
-                LEFT OUTER JOIN #serviceCalls AS svc_assign
-                ON	p.Id = svc_assign.PractitionerId
-                AND svc_assign.Status = 2
-                LEFT OUTER JOIN #serviceCalls AS svc_start
-                ON	p.Id = svc_start.PractitionerId
-                AND svc_assign.Status = 3
-                LEFT OUTER JOIN #serviceCalls AS svc_finish
-                ON	p.Id = svc_finish.PractitionerId
-                AND svc_finish.Status = 4
-                LEFT OUTER JOIN
-                (
-                	SELECT	p.Id, DateDiff( MINUTE, sc.DateCreated, IsNull( scsu.DateTime, GetDate())) AS Duration
-                	FROM	dbo.Practitioners AS p
-                	INNER JOIN #serviceCalls AS sc
-                	ON p.Id = sc.PractitionerId
-                	LEFT OUTER JOIN dbo.ServiceCallStatusUpdate AS scsu
-                	ON	sc.Id = scsu.ServiceCallId
-                	AND scsu.Status = 4
-                ) AS dur
-                ON p.Id = dur.Id
                 GROUP BY p.Id, anu.FirstName, anu.LastName
 
 
@@ -117,7 +126,7 @@ internal sealed class GetDashboardRequestHandler(
                 		Sum( Iif(sc.Status = 3, 1, 0)) AS Started,
                 		Sum( Iif(sc.Status = 4, 1, 0)) AS Finished,
                 		Sum( Iif(sc.Status = 5, 1, 0)) AS Cancelled,
-                		Avg( dur.Duration ) AS AvgDurationMinutes
+                		Avg( DateDiff( MINUTE, sc.DateCreated, finish_time.DateTime )) AS AvgDurationMinutes
                 FROM	dbo.Locations AS bldng
                 INNER JOIN dbo.Locations AS flr
                 ON bldng.Id = flr.ParentId
@@ -127,17 +136,9 @@ internal sealed class GetDashboardRequestHandler(
                 ON dep.Id = room.ParentId
                 LEFT OUTER JOIN #serviceCalls AS sc
                 ON sc.LocationId = room.Id
-                LEFT OUTER JOIN
-                (
-                	SELECT	sc.LocationId, DateDiff( MINUTE, sc.DateCreated, IsNull( scsu.DateTime, GetDate())) AS Duration
-                	FROM	dbo.Practitioners AS p
-                	INNER JOIN #serviceCalls AS sc
-                	ON p.Id = sc.PractitionerId
-                	LEFT OUTER JOIN dbo.ServiceCallStatusUpdate AS scsu
-                	ON	sc.Id = scsu.ServiceCallId
-                	AND scsu.Status = 4
-                ) AS dur
-                ON room.Id = dur.LocationId
+                LEFT OUTER JOIN dbo.ServiceCallStatusUpdate AS finish_time
+                ON	sc.Id = finish_time.ServiceCallId
+                AND finish_time.Status = 4
                 GROUP BY bldng.Name
                 ORDER BY BuildingName
                 """;
