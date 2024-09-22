@@ -113,7 +113,7 @@ internal sealed class AssignPractitionerCommandHandler(
 
         return await emailService.SendEmailUsingTemplateAsync(
             serviceCallResponse.Practitioner.Email,
-            "New Service Call Assignment",
+            PractitionerAssignedEmailTemplate.Subject,
             new PractitionerAssignedEmailTemplate(),
             model,
             cancellationToken);

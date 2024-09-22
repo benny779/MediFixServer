@@ -4,6 +4,7 @@ namespace MediFix.Application.ServiceCalls.AssignPractitioner;
 
 public sealed class PractitionerAssignedEmailTemplate : IEmailTemplate
 {
+    public const string Subject = "New Service Call Assignment";
     public string GetTemplate() => Template;
 
     private const string Template = """
