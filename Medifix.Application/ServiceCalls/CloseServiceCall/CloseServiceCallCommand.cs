@@ -1,6 +1,6 @@
 ﻿using MediFix.Application.Abstractions.Messaging;
 
-namespace MediFix.Application.ServiceCalls.CloseServiceCallCommand;
+namespace MediFix.Application.ServiceCalls.CloseServiceCall;
 
 public record CloseServiceCallCommand(
     Guid ServiceCallId,

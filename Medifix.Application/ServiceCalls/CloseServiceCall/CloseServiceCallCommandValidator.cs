@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using MediFix.Application.Extensions.Validation;
 
-namespace MediFix.Application.ServiceCalls.CloseServiceCallCommand;
+namespace MediFix.Application.ServiceCalls.CloseServiceCall;
 
 public class CloseServiceCallCommandValidator : AbstractValidator<CloseServiceCallCommand>
 {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using MediFix.Application.ServiceCalls.AssignPractitioner;
 using MediFix.Application.ServiceCalls.CancelServiceCall;
-using MediFix.Application.ServiceCalls.CloseServiceCallCommand;
+using MediFix.Application.ServiceCalls.CloseServiceCall;
 using MediFix.Application.ServiceCalls.CreateServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCall;
 using MediFix.Application.ServiceCalls.GetServiceCallsWithFilter;
