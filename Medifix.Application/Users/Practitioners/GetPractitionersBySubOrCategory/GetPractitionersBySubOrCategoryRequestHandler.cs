@@ -44,7 +44,7 @@ internal sealed class GetPractitionersBySubOrCategoryRequestHandler(
                                        			SELECT	Count( 'benny' )
                                        			FROM	dbo.ServiceCalls AS sc
                                        			WHERE	sc.PractitionerId = p.Id
-                                       			AND		sc.Status IN ( 2, 3 )
+                                       			AND		sc.Status = 2
                                        		) AS AssignedServiceCalls,
                                        		(
                                        			SELECT	Count( 'benny' )
@@ -75,7 +75,7 @@ internal sealed class GetPractitionersBySubOrCategoryRequestHandler(
                            			SELECT	Count( 'benny' )
                            			FROM	dbo.ServiceCalls AS sc
                            			WHERE	sc.PractitionerId = p.Id
-                           			AND		sc.Status IN ( 2, 3 )
+                           			AND		sc.Status = 2
                            		) AS AssignedServiceCalls,
                            		(
                            			SELECT	Count( 'benny' )
