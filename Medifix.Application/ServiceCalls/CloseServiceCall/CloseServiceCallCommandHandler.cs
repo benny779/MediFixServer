@@ -79,7 +79,7 @@ internal sealed class CloseServiceCallCommandHandler(
             serviceCall.CloseDetails!);
 
         return await emailService.SendEmailUsingTemplateAsync(
-            serviceCallResponse.Practitioner.Email,
+            serviceCallResponse.Client.Email,
             ServiceCallClosedEmailTemplate.Subject,
             new ServiceCallClosedEmailTemplate(),
             model,
