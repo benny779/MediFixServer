@@ -84,7 +84,7 @@ internal sealed class ServiceCallFakerFactory
         // 10% chance of cancellation
         bool willBeCancelled = _faker.Random.Bool(0.1f);
 
-        List<ServiceCallStatus> statuses = [];
+        List<ServiceCallStatus> statuses = [ServiceCallStatus.New];
 
         if (!willBeCancelled && _faker.Random.Bool(0.8f)) // 80% chance to assign
         {
@@ -119,24 +119,32 @@ internal sealed class ServiceCallFakerFactory
     {
         foreach (var status in statuses)
         {
-            // Random date within max 3 days
-            var lastStatusDate = serviceCall.CurrentStatus.DateTime;
-            var currentDate = _faker.Date.Between(lastStatusDate, lastStatusDate.AddDays(_faker.Random.Number(1, 3)));
+            var dateFrom = serviceCall.CurrentStatus.DateTime.AddMinutes(1);
+            DateTime currentDate;
 
             switch (status)
             {
+                case ServiceCallStatus.New:
+                    currentDate = serviceCall.DateCreated;
+                    break;
                 case ServiceCallStatus.AssignedToPractitioner:
                     serviceCall.AssignPractitioner(_updateUserId, practitionerId);
+                    currentDate = _faker.Date.Between(dateFrom, dateFrom.AddHours(_faker.Random.Number(0, 3)));
                     break;
                 case ServiceCallStatus.Started:
                     serviceCall.Start(practitionerId);
+                    currentDate = _faker.Date.Between(dateFrom, dateFrom.AddMinutes(_faker.Random.Number(10, 60 * 5)));
                     break;
                 case ServiceCallStatus.Finished:
                     serviceCall.Finish(practitionerId, _faker.Lorem.Sentence());
+                    currentDate = _faker.Date.Between(dateFrom, dateFrom.AddMinutes(_faker.Random.Number(5, 120)));
                     break;
                 case ServiceCallStatus.Cancelled:
                     serviceCall.Cancel(_updateUserId);
+                    currentDate = _faker.Date.Between(dateFrom, dateFrom.AddHours(_faker.Random.Number(0, 2)));
                     break;
+                default:
+                    throw new InvalidOperationException();
             }
 
             // Hack to set the correct date for each status update
