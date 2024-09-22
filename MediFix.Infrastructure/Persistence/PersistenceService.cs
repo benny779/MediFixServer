@@ -4,6 +4,7 @@ using MediFix.Application.Extensions;
 using MediFix.Application.Users;
 using MediFix.Application.Users.Entities;
 using MediFix.Application.Utils.Persistence;
+using MediFix.Application.Utils.Persistence.Seed;
 using MediFix.Domain.Categories;
 using MediFix.Domain.Expertises;
 using MediFix.Domain.Locations;
@@ -20,15 +21,6 @@ internal class PersistenceService(
     IApplicationUserService applicationUserService)
     : IPersistenceService
 {
-    private const string DefaultPassword = "Aq123456!";
-    private const int FakeClientsCount = 50;
-    private const int FakeServiceCallsCount = 500;
-    private const int FakeServiceCallsStartDateMonths = 3;
-    private const int FakeBuildingsCount = 3;
-    private const int FakeFloorsCount = 4;
-    private const int FakeDepartmentsCount = 4;
-    private const int FakeRoomsCount = 10;
-
     private readonly Faker _faker = new();
 
     public async Task<Result> ResetDb()
@@ -43,7 +35,7 @@ internal class PersistenceService(
         return Result.Success();
     }
 
-    public async Task<Result> SeedData()
+    public async Task<Result> SeedData(SeedDataCommand command)
     {
         // Expertises
         var expertiseGeneral = new Expertise(ExpertiseId.Create(), "General");
@@ -85,12 +77,12 @@ internal class PersistenceService(
 
 
         // Locations
-        var locations = GetLocations();
+        var locations = GetLocations(command);
 
 
         // Application users
         var appUserClient = CreateApplicationUser(UserType.Client, "client");
-        var appUserClients = Enumerable.Range(0, FakeClientsCount)
+        var appUserClients = Enumerable.Range(0, command.FakeClientsCount)
             .Select(x => CreateApplicationUser(UserType.Client, $"{_faker.Internet.UserName()}{x}"))
             .ToList();
         var appUserManager = CreateApplicationUser(UserType.Manager, "manager");
@@ -143,7 +135,7 @@ internal class PersistenceService(
             .ToArray();
 
         var serviceCallFaker = new ServiceCallFakerFactory(
-            DateTime.Now.AddMonths(-FakeServiceCallsStartDateMonths),
+            DateTime.Now.AddMonths(-command.FakeServiceCallsStartDateMonths),
             DateTime.Now,
             clients,
             rooms,
@@ -152,7 +144,7 @@ internal class PersistenceService(
             practitioners,
             manager.Id);
 
-        var serviceCalls = serviceCallFaker.Generate(FakeServiceCallsCount);
+        var serviceCalls = serviceCallFaker.Generate(command.FakeServiceCallsCount);
 
 
         // Persist
@@ -172,7 +164,7 @@ internal class PersistenceService(
 
         foreach (var applicationUser in applicationUsers)
         {
-            createResults.Add(await applicationUserService.CreateAsync(applicationUser, DefaultPassword));
+            createResults.Add(await applicationUserService.CreateAsync(applicationUser, command.DefaultPassword));
         }
 
         if (createResults.Any(result => !result.Succeeded))
@@ -197,21 +189,32 @@ internal class PersistenceService(
              .Select(x => Location.Create(LocationId.Create(), type, $"{type} {x}", parent).Value);
     }
 
-    private static List<Location> GetLocations()
+    private static List<Location> GetLocations(SeedDataCommand command)
     {
-        var buildings = CreateLocations(null, LocationType.Building, 1, FakeBuildingsCount)
+        var buildings = CreateLocations(null, LocationType.Building, 1, command.FakeBuildingsCount)
             .ToList();
 
         var floors = buildings
-            .SelectMany(building => CreateLocations(building, LocationType.Floor, ExtractNumbers(building.Name), FakeFloorsCount))
+            .SelectMany(building => CreateLocations(
+                building,
+                LocationType.Floor,
+                ExtractNumbers(building.Name),
+                command.FakeFloorsCount))
             .ToList();
 
         var departments = floors
-            .SelectMany(floor => CreateLocations(floor, LocationType.Department, ExtractNumbers(floor.Name), FakeDepartmentsCount))
+            .SelectMany(floor => CreateLocations(floor,
+                LocationType.Department,
+                ExtractNumbers(floor.Name),
+                command.FakeDepartmentsCount))
             .ToList();
 
         var rooms = departments
-            .SelectMany(dep => CreateLocations(dep, LocationType.Room, ExtractNumbers(dep.Name) * 2 + 100, FakeRoomsCount))
+            .SelectMany(dep => CreateLocations(
+                dep,
+                LocationType.Room,
+                ExtractNumbers(dep.Name) * 2 + 100,
+                command.FakeRoomsCount))
             .ToList();
 
 

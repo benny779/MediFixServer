@@ -19,9 +19,9 @@ public class UtilsController(ISender sender) : ApiController
     }
 
     [HttpPost("persistence/seed")]
-    public async Task<IActionResult> Seed(CancellationToken cancellationToken)
+    public async Task<IActionResult> Seed([FromBody] SeedDataCommand command, CancellationToken cancellationToken)
     {
-        var result = await sender.Send(new SeedDataCommand(), cancellationToken);
+        var result = await sender.Send(command, cancellationToken);
 
         return result.Match(Ok, Problem);
     }

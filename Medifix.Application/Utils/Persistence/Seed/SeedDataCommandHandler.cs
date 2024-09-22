@@ -4,11 +4,11 @@ using MediFix.SharedKernel.Results;
 namespace MediFix.Application.Utils.Persistence.Seed;
 
 internal sealed class SeedDataCommandHandler(
-    IPersistenceService persistenceService) 
+    IPersistenceService persistenceService)
     : ICommandHandler<SeedDataCommand>
 {
-    public async Task<Result> Handle(SeedDataCommand request, CancellationToken cancellationToken)
+    public Task<Result> Handle(SeedDataCommand request, CancellationToken cancellationToken)
     {
-        return await persistenceService.SeedData();
+        return persistenceService.SeedData(request);
     }
 }
