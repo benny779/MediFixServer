@@ -73,7 +73,7 @@ internal sealed class CreateServiceCallCommandHandler(
 
         return await emailService.SendEmailUsingTemplateAsync(
             serviceCallResponse.Client.Email,
-            "Service Call Confirmation",
+            ServiceCallCreatedEmailTemplate.Subject,
             new ServiceCallCreatedEmailTemplate(),
             model,
             cancellationToken);

@@ -4,6 +4,7 @@ namespace MediFix.Application.ServiceCalls.CreateServiceCall;
 
 public sealed class ServiceCallCreatedEmailTemplate : IEmailTemplate
 {
+    public const string Subject = "Service Call Confirmation";
     public string GetTemplate() => Template;
 
     private const string Template = """
