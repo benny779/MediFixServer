@@ -99,7 +99,8 @@ internal sealed class GetDashboardRequestHandler(
                 			AND		sc.Status = 4
                 		) AS Finished,
                 		(
-                			SELECT	Avg( DateDiff( MINUTE, assign_time.DateTime, IsNull( finish_time.DateTime, GetDate())))
+                			--SELECT	Avg( DateDiff( MINUTE, assign_time.DateTime, IsNull( finish_time.DateTime, GetDate())))
+                			SELECT	Avg( DateDiff( MINUTE, assign_time.DateTime, finish_time.DateTime))
                 			FROM	dbo.Practitioners AS prac
                 			INNER JOIN #serviceCalls AS sc
                 			ON prac.Id = sc.PractitionerId
